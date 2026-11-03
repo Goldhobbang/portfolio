@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090a">
+<meta name="description" content="GoldHobbang — 실제로 만든 개발 도구와 소프트웨어를 기록합니다. 배경은 실시간으로 계산되는 블랙홀 시뮬레이션입니다.">
+<meta property="og:title" content="GoldHobbang — Code, made tangible.">
+<meta property="og:description" content="검색 인프라, 개발 도구, 브라우저 편집기, 한국어 분석 및 데이터 연구의 기록.">
+<meta property="og:type" content="website">
+<title>GoldHobbang — Project Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08090a;--ink:#f4f3f0;--muted:#a6a9a8;--rule:rgba(244,243,240,.2);--orange:#ff683b;--paper:#e9e9e6;--dark:#191b1e;
+  --glass:rgba(10,11,12,.66);
+  --head:"Archivo Black","Arial Black",Arial,sans-serif;
+  --ko:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --pad:clamp(20px,5.2vw,88px);--hero-drift:0px;
+}
+*,*:before,*:after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--void)}
+body{margin:0;background:var(--void);color:var(--ink);font:400 15px/1.75 var(--ko);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+::selection{background:var(--orange);color:var(--void)}
+.skip{position:absolute;top:-70px;left:18px;padding:12px;background:var(--orange);color:#101010;z-index:200}
+.skip:focus{top:10px}
+.inner{max-width:1600px;padding-inline:var(--pad);margin-inline:auto}
+.meta{font:500 11px/1.65 var(--mono);letter-spacing:.03em}
+
+/* ---- background ---- */
+#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0}
+#fallback{position:fixed;inset:0;z-index:0;display:none;background:radial-gradient(circle at 70% 46%,#000 0 8%,#ff9a3c 9.5%,#6a2e0c 15%,transparent 30%),var(--void)}
+.no-gl #fallback{display:block}.no-gl #gl{display:none}
+#boot{position:fixed;inset:0;z-index:300;background:var(--void);display:grid;place-items:center;transition:opacity 1.2s ease .15s,visibility 0s 1.5s}
+#boot.done{opacity:0;visibility:hidden}
+#boot div{display:flex;flex-direction:column;align-items:center;gap:22px;font:500 11px var(--mono);letter-spacing:.3em;color:var(--muted)}
+#boot b{font:400 26px var(--head);letter-spacing:-.08em;color:var(--ink)}#boot b i{font-style:normal;color:var(--orange)}
+#boot u{display:block;width:1px;height:48px;background:linear-gradient(var(--orange),transparent);animation:drip 1.4s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.page-progress{position:fixed;inset:0 0 auto;z-index:150;height:3px;pointer-events:none}
+.page-progress span{display:block;height:100%;transform:scaleX(0);transform-origin:0 50%;background:var(--orange)}
+
+/* ---- nav ---- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:82px;display:flex;align-items:center;gap:30px;justify-content:space-between;background:linear-gradient(rgba(8,9,10,.8),rgba(8,9,10,0));border-bottom:1px solid rgba(244,243,240,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);max-width:none}
+.logo{font:400 24px/1 var(--head);letter-spacing:-.08em;white-space:nowrap}.logo b{color:var(--orange);font-weight:inherit}
+.links{display:flex;align-items:center;gap:clamp(14px,2.6vw,40px);font:500 11px var(--mono)}
+.links a{position:relative;padding:6px 0;transition:color .2s}.links a:hover{color:var(--orange)}
+.links a[aria-current="location"]{color:var(--orange)}
+.links a[aria-current="location"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--orange);animation:navline .38s var(--ease) both;transform-origin:left}
+@keyframes navline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+main{position:relative;z-index:2}
+
+/* ---- hero ---- */
+.hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:clamp(120px,14vh,170px);padding-bottom:clamp(50px,7vw,90px)}
+.hero-cap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--muted)}.hero-cap span:first-child{color:var(--orange)}
+.hero-title{font:400 clamp(63px,12.3vw,214px)/.98 var(--head);letter-spacing:-.095em;margin:clamp(30px,4.5vw,70px) 0 clamp(40px,6vw,100px);text-shadow:0 0 60px rgba(0,0,0,.55)}
+.hero-title>span{display:block}.hero-title .second{padding-left:clamp(28px,10vw,160px)}.hero-title .point{display:inline-block;color:var(--orange)}
+.hero-bottom{display:grid;grid-template-columns:1.15fr .8fr;gap:clamp(30px,7vw,140px);align-items:end}
+.hero-statement{font:600 clamp(22px,2.4vw,36px)/1.55 var(--ko);letter-spacing:-.055em;margin:0;word-break:keep-all;text-shadow:0 0 30px rgba(0,0,0,.7)}
+.hero-aside{border-left:1px solid var(--rule);padding-left:clamp(22px,3vw,46px)}
+.hero-aside p{color:#d3d6d4;font-size:14px;line-height:1.95;margin:0 0 28px;max-width:470px;word-break:keep-all;text-shadow:0 0 18px rgba(0,0,0,.8)}
+.inline-link{display:inline-block;border-bottom:1px solid currentColor;padding-bottom:5px;font:500 11px var(--mono);transition:transform .26s var(--ease),color .26s}
+.inline-link:hover{color:var(--orange);transform:translateY(-3px)}
+.signal{position:relative;overflow:hidden;background:var(--orange);color:#141618}
+.signal .inner{display:flex;justify-content:space-between;align-items:center;gap:30px;min-height:74px}
+.signal span{font:500 12px var(--mono)}.signal strong{font:400 clamp(16px,2vw,28px) var(--head);letter-spacing:-.03em}
+.signal::after{content:"";position:absolute;inset:0 auto 0 0;width:10%;background:#121416;opacity:.16;transform:translate3d(-130%,0,0) skewX(-28deg);pointer-events:none}
+.motion-on .signal.is-visible::after{animation:wipe 1.3s .12s var(--ease) 1 both}
+@keyframes wipe{to{transform:translate3d(1100%,0,0) skewX(-28deg)}}
+
+/* ---- section heads ---- */
+.section-top{position:relative;padding-block:clamp(74px,8vw,120px) 32px;border-bottom:1px solid rgba(244,243,240,.5)}
+.section-top h2{font:400 clamp(31px,5vw,68px)/1.1 var(--head);letter-spacing:-.064em;margin:9px 0 0;text-shadow:0 0 40px rgba(0,0,0,.6)}
+.section-top .meta{color:var(--muted)}
+.section-top::after{content:"";position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:var(--orange);transform:scaleX(0);transform-origin:left;opacity:0;transition:transform 1.15s var(--ease),opacity .5s}
+.motion-on .section-top.is-visible::after,html:not(.motion-on) .section-top::after{transform:scaleX(1);opacity:1}
+
+/* ---- stack ---- */
+.stack{padding-bottom:clamp(74px,10vw,150px)}
+.stack-intro{padding:26px 0 24px}.stack-intro p{margin:0;font:600 clamp(19px,2vw,26px)/1.6 var(--ko);max-width:690px;word-break:keep-all;text-shadow:0 0 24px rgba(0,0,0,.7)}
+.stack-list{border-top:2px solid var(--ink);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.stack-row{position:relative;display:grid;grid-template-columns:minmax(108px,.58fr) minmax(0,2.15fr) minmax(138px,.8fr);gap:clamp(18px,3vw,45px);padding:30px clamp(14px,2vw,28px) 34px;border-bottom:1px solid var(--rule);align-items:start}
+.stack-row::before{content:"";position:absolute;top:-1px;left:0;height:2px;width:100%;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.stack-row:hover::before,.stack-row:focus-within::before{transform:scaleX(1)}
+.stack-id{color:var(--orange);padding-top:7px}
+.stack-center h3{font:600 clamp(19px,2.35vw,31px)/1.48 var(--ko);letter-spacing:-.045em;margin:0;overflow-wrap:anywhere;transition:transform .4s var(--ease)}
+.stack-row:hover h3{transform:translateX(7px)}
+.stack-plus{color:var(--orange);font-weight:400;padding-inline:.13em}
+.stack-used{display:flex;flex-direction:column;gap:8px;padding-top:7px;align-items:flex-start}
+.stack-used a{color:#c7cbc8;border-bottom:1px solid transparent;overflow-wrap:anywhere;transition:color .2s,border-color .2s}.stack-used a:hover{color:var(--orange);border-color:var(--orange)}
+
+/* ---- work ---- */
+.work{padding-bottom:clamp(70px,9vw,136px)}
+.case{display:grid;grid-template-columns:clamp(48px,8vw,135px) minmax(0,1fr);gap:clamp(15px,3vw,40px);padding:clamp(40px,5vw,80px) clamp(14px,2vw,28px);border-bottom:1px solid var(--rule);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.case+.case{margin-top:-1px}
+.case-no{font:400 clamp(22px,3vw,44px)/1 var(--head);letter-spacing:-.06em;color:var(--orange)}
+.case-body{min-width:0}
+.case h3{font:400 clamp(48px,7.2vw,108px)/1 var(--head);letter-spacing:-.075em;margin:9px 0 34px;overflow-wrap:anywhere}
+.case-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,85px)}
+.case p{font-size:15px;line-height:1.9;color:#d0d4d2;max-width:510px;word-break:keep-all;margin:0 0 25px}
+.project-demo{display:inline-block;margin-left:24px}
+.machine{border-top:1px solid #9a9d9c;border-bottom:1px solid #9a9d9c;align-self:start}
+.machine-head{padding:13px 0 14px;color:#e2e5e4}
+.machine-step{display:grid;grid-template-columns:38px minmax(0,1fr) 24px;gap:16px;padding:13px 0;border-top:1px solid var(--rule);font:500 13px/1.5 var(--mono)}
+.machine-step span{color:var(--orange)}.machine-step b{font-weight:500}.machine-step i{font-style:normal;color:#959a98;transition:color .45s}
+.diff{align-self:start;border:1px solid #777e7d}
+.diff-title{padding:13px 17px;border-bottom:1px solid #777e7d}
+.diff-row{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:15px 14px;font:400 12px/1.6 var(--mono);border-bottom:1px solid var(--rule)}
+.diff-row:last-child{border:0}.diff-row span{color:var(--muted)}.diff-row code{overflow-wrap:anywhere;white-space:pre-wrap}.diff-row.good{color:#bfe6bd}
+/* inverted case */
+.case-alt{background:var(--paper);color:var(--dark);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:#c9c9c4}
+.case-alt p{color:#3e4444}.case-alt .case-no{color:var(--dark)}.case-alt .inline-link:hover{color:#da431f}
+.routing{align-self:start;border:1px solid #27292b;padding:22px 21px 21px}
+.routing-label{display:block;margin-bottom:18px}
+.routing-query{background:#1b1d1e;color:#fbfaf5;font:500 13px/1.75 var(--mono);padding:18px;overflow-wrap:anywhere}
+.routing-line{border-left:1px solid #303232;height:34px;margin-left:20px;transform-origin:top}
+.routing-result{display:flex;justify-content:space-between;gap:10px;border:1px solid #333;padding:12px 14px;font:500 12px var(--mono)}
+.routing-tags{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.routing-tags span{background:#d0d0cc;font:400 10px/1.45 var(--mono);text-align:center;padding:10px 3px;overflow-wrap:anywhere}
+
+/* ---- playground / simulator ---- */
+.playground{min-height:190vh;padding-bottom:12vh}
+.pg-col{position:sticky;top:96px;width:min(420px,100%);max-height:calc(100vh - 112px);max-height:calc(100svh - 112px);overflow-y:auto;scrollbar-width:none;padding-top:34px}
+.pg-col::-webkit-scrollbar{display:none}
+.pg-intro{margin-bottom:22px;text-shadow:0 0 22px rgba(0,0,0,.85)}
+.pg-intro p{margin:0;font-size:14px;line-height:1.85;color:#e0e3e1;word-break:keep-all}
+.pg-intro p+p{margin-top:10px;color:var(--muted);font-size:13px}
+.hud{background:var(--glass);border:1px solid rgba(244,243,240,.22);padding:22px 22px 18px;backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.hud header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.hud h3{font:400 15px var(--head);letter-spacing:-.04em;margin:0}
+.live{font:500 10px var(--mono);letter-spacing:.16em;color:var(--orange);display:flex;align-items:center;gap:8px}
+.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.chip{font:500 11px var(--ko);padding:7px 11px;border:1px solid var(--rule);color:#d0d4d2;transition:.2s}
+.chip:hover{border-color:var(--ink);color:var(--ink)}.chip.on{background:var(--ink);color:var(--void);border-color:var(--ink)}
+.ctl{margin-bottom:15px}
+.ctl label{display:flex;justify-content:space-between;font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.ctl output{color:var(--ink)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--orange) var(--p,50%),rgba(244,243,240,.22) var(--p,50%))}
+input[type=range]::-moz-range-track{height:2px;background:rgba(244,243,240,.22)}
+input[type=range]::-moz-range-progress{height:2px;background:var(--orange)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--ink);margin-top:-5px;border:0;border-radius:0;transition:background .2s,transform .2s}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:0;background:var(--ink)}
+input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-slider-thumb{background:var(--orange);transform:scale(1.25)}
+.tog{display:flex;justify-content:space-between;align-items:center;font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--muted)}
+.sw{width:38px;height:20px;border:1px solid var(--rule);position:relative;transition:.25s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;background:var(--muted);transition:.25s}
+.sw[aria-pressed=true]{border-color:var(--orange)}.sw[aria-pressed=true]::after{left:21px;background:var(--orange)}
+.telem{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin:18px 0 0}
+.telem div{background:rgba(8,9,10,.85);padding:10px 12px}
+.telem dt{font:500 9.5px var(--mono);letter-spacing:.1em;color:var(--muted)}
+.telem dd{margin:2px 0 0;font:500 14px var(--mono);font-variant-numeric:tabular-nums}
+.hint{margin:14px 0 0;font:500 10px var(--mono);letter-spacing:.1em;color:var(--muted)}
+
+/* ---- index ---- */
+.archive{padding-bottom:clamp(110px,12vw,190px)}
+.archive-list{list-style:none;margin:0;padding:0;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.archive-list li{position:relative;border-bottom:1px solid var(--rule)}
+.archive-list li::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:var(--orange);transform-origin:left;transform:scaleX(0);transition:transform .65s var(--ease);pointer-events:none}
+.archive-list li:hover::after,.archive-list li:focus-within::after{transform:scaleX(1)}
+.archive-list a{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:20px;padding:25px clamp(14px,2vw,28px);align-items:start;transition:background .2s}
+.archive-list a:hover{background:rgba(244,243,240,.05)}
+.archive-name strong{font:400 clamp(20px,2.4vw,33px)/1.25 var(--head);letter-spacing:-.055em;overflow-wrap:anywhere;display:block;transition:transform .4s var(--ease),color .35s}
+.archive-name small{font:400 12px/1.8 var(--ko);color:#b4b9b6;display:block;margin-top:5px;word-break:keep-all;max-width:800px}
+.archive-access{font:400 11px/1.6 var(--mono);color:var(--muted);text-align:right}.archive-access .up{display:inline-block;color:var(--orange);transition:transform .26s var(--ease)}
+.archive-list li:hover strong,.archive-list li:focus-within strong{transform:translateX(8px);color:var(--orange)}
+.archive-list li:hover .up{transform:translate(4px,-4px)}
+
+/* ---- about / footer ---- */
+.about{background:var(--orange);color:var(--dark);padding-block:clamp(80px,10vw,150px)}
+.about-grid{max-width:920px;margin-inline:0}
+.about h2{font:400 clamp(37px,5.3vw,72px)/1.22 var(--head);letter-spacing:-.07em;margin:0 0 35px;overflow-wrap:anywhere}
+.about p{font:500 15px/1.95 var(--ko);max-width:610px;margin:0 0 30px;word-break:keep-all}
+.about .inline-link:hover{color:#fff}
+.footer{position:relative;z-index:2;background:var(--void);padding-block:44px 48px;display:flex;justify-content:space-between;gap:20px;align-items:center;color:var(--muted);max-width:none}
+.footer a:hover{color:var(--orange)}
+
+/* ---- motion ---- */
+.motion-on .nav .logo{animation:enter .75s var(--ease) both}.motion-on .nav .links{animation:enter .8s .13s var(--ease) both}
+.motion-on .hero-cap{animation:enter .75s .6s var(--ease) both}
+.motion-on .hero-title>span{animation:arrive 1.05s var(--ease) both;transform-origin:left bottom}
+.motion-on .hero-title>span:first-child{animation-delay:.8s}.motion-on .hero-title>span.second{animation-delay:1s}
+.motion-on .hero-title .point{animation:pop .7s 1.7s var(--ease) both}
+.motion-on .hero-statement{animation:enter .9s 1.25s var(--ease) both}.motion-on .hero-aside{animation:enter 1s 1.4s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:none}}
+@keyframes arrive{0%{opacity:0;transform:translate3d(0,70px,0) skewY(2deg);filter:blur(5px)}75%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
+@keyframes pop{0%{opacity:0;transform:translate3d(0,28px,0) scale(.4)}72%{opacity:1;transform:translate3d(0,-6px,0) scale(1.09)}100%{opacity:1;transform:none}}
+@media(min-width:661px){.motion-on .hero-title{transform:translate3d(0,calc(-1*var(--hero-drift)),0)}}
+.motion-on .reveal{opacity:0;transform:translate3d(0,34px,0);transition:opacity .85s var(--ease),transform .9s var(--ease);transition-delay:var(--d,0ms)}
+.motion-on .reveal.is-visible{opacity:1;transform:none}
+.motion-on .case .case-inner>div:first-child,.motion-on .case h3{opacity:0;transform:translate3d(0,25px,0);transition:opacity .75s var(--ease),transform .8s var(--ease)}
+.motion-on .case.is-visible h3,.motion-on .case.is-visible .case-inner>div:first-child{opacity:1;transform:none}
+.motion-on .case.is-visible h3{transition-delay:.18s}.motion-on .case.is-visible .case-inner>div:first-child{transition-delay:.32s}
+.motion-on .case .machine,.motion-on .case .routing,.motion-on .case .diff{opacity:0;transform:translate3d(28px,0,0);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.motion-on .case.is-visible .machine,.motion-on .case.is-visible .routing,.motion-on .case.is-visible .diff{opacity:1;transform:none;transition-delay:.4s}
+.motion-on .machine-step,.motion-on .diff-row{opacity:0;transform:translate3d(-18px,0,0);transition:opacity .62s var(--ease),transform .66s var(--ease);transition-delay:calc(.6s + var(--s,0)*.17s)}
+.motion-on .case.is-visible .machine-step,.motion-on .case.is-visible .diff-row{opacity:1;transform:none}
+.motion-on .case.is-visible .machine-step i{color:var(--orange)}
+.machine-step:nth-of-type(2),.diff-row:nth-of-type(2){--s:0}.machine-step:nth-of-type(3),.diff-row:nth-of-type(3){--s:1}.machine-step:nth-of-type(4),.diff-row:nth-of-type(4){--s:2}.machine-step:nth-of-type(5),.diff-row:nth-of-type(5){--s:3}
+.motion-on .routing-query{opacity:0;transform:translateY(14px);transition:opacity .65s var(--ease),transform .65s var(--ease);transition-delay:.62s}
+.motion-on .routing-line{transform:scaleY(0);transition:transform .5s var(--ease) .93s}
+.motion-on .routing-result{opacity:0;transform:translateY(9px);transition:opacity .5s var(--ease) 1.23s,transform .5s var(--ease) 1.23s}
+.motion-on .routing-tags span{opacity:0;transform:translateY(12px);transition:opacity .48s var(--ease),transform .48s var(--ease);transition-delay:calc(1.5s + var(--s,0)*.13s)}
+.routing-tags span:nth-child(2){--s:1}.routing-tags span:nth-child(3){--s:2}
+.motion-on .case.is-visible .routing-query,.motion-on .case.is-visible .routing-result,.motion-on .case.is-visible .routing-tags span{opacity:1;transform:none}
+.motion-on .case.is-visible .routing-line{transform:scaleY(1)}
+.motion-on .about h2{transform-origin:left}.motion-on .about.is-visible h2{animation:about .95s .13s var(--ease) both}
+@keyframes about{from{letter-spacing:-.12em;opacity:.45;transform:translateX(-18px)}to{letter-spacing:-.07em;opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.motion-on *,.motion-on *::before,.motion-on *::after{animation:none!important;transition:none!important}.motion-on .reveal,.motion-on .case *{opacity:1!important;transform:none!important}#boot u{animation:none}}
+
+/* ---- responsive ---- */
+@media(max-width:950px){.case-inner{grid-template-columns:1fr}.case p{max-width:650px}.machine,.routing,.diff{max-width:640px}.hero-title{font-size:clamp(58px,12.6vw,112px)}}
+@media(max-width:900px){.pg-col{position:static;max-height:none;margin-inline:auto}.playground{display:flex;flex-direction:column;justify-content:flex-end;min-height:170vh}}
+@media(max-width:660px){
+  .nav{height:68px}.logo{font-size:19px}.links{gap:14px;font-size:10px}.links a:nth-child(n+2):not(:nth-child(3)):not(:last-child){display:none}
+  .hero-title{font-size:clamp(46px,13vw,80px)}.hero-title .second{padding-left:7vw}
+  .hero-bottom{grid-template-columns:1fr;gap:28px}.hero-aside{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:24px}
+  .signal .inner{min-height:64px}.signal strong{font-size:15px}
+  .stack-row{grid-template-columns:1fr;gap:12px;padding-block:24px}.stack-id{padding:0}.stack-used{flex-direction:row;flex-wrap:wrap;gap:8px 18px;padding-top:0}
+  .case{grid-template-columns:1fr;gap:12px}.case-no{font-size:26px}.case h3{font-size:clamp(43px,11vw,70px)}
+  .project-demo{display:block;margin:17px 0 0}
+  .archive-list a{grid-template-columns:minmax(0,1fr) 75px;gap:12px}
+  .footer{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<canvas id="gl" role="img" aria-label="실시간으로 렌더링되는 블랙홀 배경"></canvas>
+<div id="fallback"></div>
+<div id="boot"><div><b>GH<i>/</i></b><u></u>RAY TRACING</div></div>
+<div class="page-progress" aria-hidden="true"><span></span></div>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="nav inner"><a class="logo" href="#top" aria-label="GoldHobbang 홈">GH<b>/</b></a>
+<nav class="links" aria-label="사이트 메뉴"><a href="#stack">STACK</a><a href="#selected">WORK</a><a href="#playground">PLAYGROUND</a><a href="#archive">INDEX</a><a href="#about">ABOUT</a><a href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></nav></header>
+
+<main id="main">
+<section class="hero inner" id="top" aria-labelledby="hero-heading">
+  <div class="hero-cap meta"><span>PORTFOLIO</span><span>PROJECT INDEX</span></div>
+  <h1 class="hero-title" id="hero-heading"><span>GOLD</span><span class="second">HOBBANG<span class="point">.</span></span></h1>
+  <div class="hero-bottom">
+    <p class="hero-statement">직접 쓰고 싶은 도구를 만들고,<br>작동하는 이유까지 확인합니다.</p>
+    <div class="hero-aside"><p>Python과 TypeScript를 중심으로 개발 도구, 데이터 시스템, 웹·데스크톱 앱을 만드는 학생 개발자입니다. 사용한 기술은 실제 저장소와 연결해 두었습니다.</p><a class="inline-link" href="#selected">SELECTED WORK ↓</a></div>
+  </div>
+</section>
+<div class="signal reveal-signal"><div class="inner"><strong>12 PROJECTS.</strong><span>5 PUBLIC · 7 PRIVATE</span></div></div>
+
+<section class="stack inner" id="stack" aria-labelledby="stack-heading">
+  <div class="section-top"><h2 id="stack-heading">THE TOOLKIT.</h2></div>
+  <div class="stack-intro"><p>실제 프로젝트에서 사용한 기술을 정리했습니다.</p></div>
+  <div class="stack-list">
+    <div class="stack-row"><div class="stack-id meta">LANGUAGES</div><div class="stack-center"><h3>Python <span class="stack-plus">/</span> TypeScript <span class="stack-plus">/</span> JavaScript</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer">Delint ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">APPLICATIONS</div><div class="stack-center"><h3>React <span class="stack-plus">/</span> Next.js <span class="stack-plus">/</span> Tauri <span class="stack-plus">/</span> Expo</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">PocVault ↗</a><a href="https://github.com/Goldhobbang/TodoGround" target="_blank" rel="noopener noreferrer">TodoGround ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">DATA</div><div class="stack-center"><h3>SQLite FTS5 <span class="stack-plus">/</span> Prisma <span class="stack-plus">/</span> MCP</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Hobbang-BRAIN" target="_blank" rel="noopener noreferrer">Hobbang-BRAIN ↗</a><a href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">PocVault ↗</a><a href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">omniSearch ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">ENGINEERING</div><div class="stack-center"><h3>AST <span class="stack-plus">/</span> CLI <span class="stack-plus">/</span> Vitest <span class="stack-plus">/</span> GitHub Actions</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer">Delint ↗</a><a href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">omniSearch ↗</a></div></div>
+  </div>
+</section>
+
+<section class="work inner" id="selected" aria-labelledby="selected-heading">
+  <div class="section-top"><h2 id="selected-heading">SELECTED.</h2></div>
+  <article class="case" id="case-1" aria-labelledby="todoground-title"><div class="case-no">01</div><div class="case-body"><h3 id="todoground-title">TodoGround</h3><div class="case-inner"><div><p>Windows 바탕화면에서 할 일과 메모를 바로 확인하도록 설계한 생산성 도구입니다. React 캔버스 편집기의 레이아웃을 Rust·resvg 렌더링 파이프라인과 연결해 정적 배경화면으로 출력합니다. 실시간 상호작용 모드는 실제 기기 검증이 더 필요합니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/TodoGround" target="_blank" rel="noopener noreferrer">GITHUB · PRIVATE ↗</a></div>
+    <div class="machine" aria-label="TodoGround 렌더링 구조 예시"><div class="machine-head meta"><span>배경화면 렌더링 흐름</span></div><div class="machine-step"><span>01</span><b>Canvas editor &amp; widgets</b><i>↘</i></div><div class="machine-step"><span>02</span><b>Shared layout data</b><i>↘</i></div><div class="machine-step"><span>03</span><b>Rust + resvg → PNG wallpaper</b><i>✓</i></div><div class="machine-step"><span>04</span><b>Lively interactive mode</b><i>↗</i></div></div></div></div></article>
+  <article class="case case-alt" id="case-2" aria-labelledby="pocvault-title"><div class="case-no">02</div><div class="case-body"><h3 id="pocvault-title">PocVault</h3><div class="case-inner"><div><p>흩어진 메모와 링크를 한곳에서 관리하는 개인용 웹 보관함입니다. Next.js·NextAuth 기반 Google OAuth 인증, Prisma 데이터 모델, 메모·북마크 CRUD와 태그 검색을 구현했습니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">GITHUB · PRIVATE ↗</a></div>
+    <div class="routing" aria-label="PocVault 인증과 데이터 흐름 도식"><span class="routing-label meta">인증 · 저장</span><div class="routing-query">Google OAuth → authenticated session</div><div class="routing-line" aria-hidden="true"></div><div class="routing-result"><strong>Next.js API</strong><span>↔</span><span>Prisma</span></div><div class="routing-tags"><span>Notes</span><span>Links</span><span>Tags / Search</span></div></div></div></div></article>
+  <article class="case" id="case-3" aria-labelledby="omni-title"><div class="case-no">03</div><div class="case-body"><h3 id="omni-title">omniSearch</h3><div class="case-inner"><div><p>API 키 없이 사용할 수 있는 검색 소스를 질의 유형에 따라 선택하는 검색 라우터입니다. 규칙 기반 분류·점수화·폴백 및 결과 융합을 구현했으며 Python 라이브러리, CLI, MCP 서버, 웹 UI로 제공합니다. 브라우저 데모는 CORS 허용 엔진으로 제한됩니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">GITHUB ↗</a><span class="project-demo"><a class="inline-link" href="https://goldhobbang.github.io/omniSearch/" target="_blank" rel="noopener noreferrer">DEMO ↗</a></span></div>
+    <div class="diff" aria-label="omniSearch 검색 라우팅 개념 예시"><div class="diff-title meta"><span>검색 처리 흐름</span></div><div class="diff-row"><span>01</span><code>query: Attention Is All You Need</code></div><div class="diff-row good"><span>02</span><code>classify → scholarly query</code></div><div class="diff-row"><span>03</span><code>OpenAlex / Crossref / arXiv</code></div><div class="diff-row"><span>04</span><code>score → select / fuse results</code></div></div></div></div></article>
+</section>
+
+<section class="playground inner" id="playground" aria-labelledby="pg-heading">
+  <div class="section-top"><h2 id="pg-heading">PLAYGROUND.</h2></div>
+  <div class="pg-intro">
+    <p>이 페이지 뒤의 블랙홀은 이미지가 아니라 WebGL2 셰이더가 매 프레임 계산하는 시뮬레이션입니다. 화면의 픽셀마다 광선 하나를 중력으로 휘며 추적합니다.</p>
+    <p>회전하지 않는 블랙홀(슈바르츠실트) 근사이며, 색과 밝기에는 연출이 포함됩니다. 빈 곳을 드래그하면 블랙홀 주위를 돌 수 있습니다.</p>
+  </div>
+</section>
+
+<section class="archive inner" id="archive" aria-labelledby="archive-heading">
+  <div class="section-top"><h2 id="archive-heading">THE INDEX.</h2></div>
+  <ol class="archive-list">
+    <li><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>Delint</strong><small>TypeScript 기반 디자인 토큰 정적 분석기. AST·규칙 엔진·보수적 자동 수정</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/Hobbang-BRAIN" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>Hobbang-BRAIN</strong><small>개인 데이터 정규화, 원본 출처 보존, SQLite FTS 기반 지식 검색</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/DiagramPreview" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>DiagramPreview</strong><small>HTML 프레젠테이션 템플릿과 다이어그램 라이브러리·Figma 조합 빌더</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/FoodRoulette" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>FoodRoulette</strong><small>룰렛과 자연어 필터를 결합한 React Native 음식 선택 앱</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/pyasynckit" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>pyasynckit</strong><small>asyncio 재시도와 백오프를 위한 경량 Python 라이브러리 (초기 개발)</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/AutismResearch" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>AutismResearch</strong><small>웨어러블 생체신호 기반 조기 위험 알림 연구. WESAD 성인 스트레스 분류와 LOSO 검증, ESP32-S3 제품 설계를 수행했으며 아동 멜트다운 조기예측 성능은 아직 검증하지 않음</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/PDFNative" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>PDFNative</strong><small>PDF.js·PDFium WASM 기반 브라우저 내 PDF 텍스트·이미지 편집기. 로컬 처리, 원본 보존, 검증 가능한 편집을 지향하며 지원하지 않는 PDF 구조는 편집을 제한</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/PoomSa" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>PoomSa</strong><small>한국어 품사·형태소·문장 성분 학습 웹앱. 브라우저 WASM 형태소 분석과 규칙 기반 해설을 결합하며 자유 문장 채점은 잠정 정답으로 제공</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/HnolMokhwa" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>HnolMokhwa</strong><small>Three.js 기반 3D 스텔스 웹게임. 시야 회피·은신·카메라 전환과 모바일 조작을 구현한 인터랙티브 게임 프로젝트</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+  </ol>
+</section>
+
+<section class="about" id="about" aria-labelledby="about-heading"><div class="inner about-grid"><div><h2 id="about-heading">Build it.<br>Then verify.</h2><p>컴퓨터공학과 데이터과학을 공부하는 학생 개발자 GoldHobbang입니다. TodoGround, PocVault, omniSearch뿐 아니라 PDFNative, PoomSa, AutismResearch 등 개발 도구와 데이터 연구를 직접 설계하고 구현합니다. 만들었다는 사실보다 어떻게 설계했고 무엇을 검증했는지를 중요하게 생각합니다.</p><a class="inline-link" href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></div></div></section>
+</main>
+<footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="#top">BACK TO TOP ↑</a></footer>
+
+<script id="vs" type="x-shader/x-vertex">#version 300 es
+in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}
+</script>
+<script id="fs-scene" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform vec2 uRes;uniform float uTime;uniform vec3 uCam;uniform vec2 uShift;
+uniform float uLens,uDisk,uDop,uSpd,uFov;
+out vec4 o;
+const float RIN=3.0,ROUT=13.0;
+
+float h13(vec3 p){p=fract(p*.1031);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
+vec3 h33(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.xxy+p.yxx)*p.zyx);}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+  return mix(mix(mix(h13(i),h13(i+vec3(1,0,0)),f.x),mix(h13(i+vec3(0,1,0)),h13(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(h13(i+vec3(0,0,1)),h13(i+vec3(1,0,1)),f.x),mix(h13(i+vec3(0,1,1)),h13(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*vn(p);p=p*2.03+7.1;a*=.5;}return s;}
+
+vec3 starTint(float t){return mix(vec3(.7,.82,1.),vec3(1.,.82,.62),t);}
+vec3 stars(vec3 d){
+  vec3 c=vec3(0);
+  for(int i=0;i<3;i++){
+    float s=90.+float(i)*85.;
+    vec3 q=d*s,id=floor(q),f=fract(q)-.5;
+    float h=h13(id+float(i)*19.7);
+    if(h>.955){
+      vec3 off=(h33(id)-.5)*.55;
+      float dist=length(f-off);
+      float b=(h-.955)/.045;
+      float st=smoothstep(.2,0.,dist)*(.25+b*b*2.2);
+      c+=st*starTint(h33(id+3.).x);
+    }
+  }
+  return c;
+}
+vec3 sky(vec3 d){
+  vec3 n=normalize(vec3(.35,.82,-.45));
+  float band=exp(-pow(dot(d,n)*3.2,2.));
+  float cl=fbm(d*3.2+vec3(2.));
+  float cl2=fbm(d*7.5+vec3(11.));
+  vec3 neb=mix(vec3(.05,.07,.15),vec3(.2,.1,.08),cl2)*smoothstep(.35,.9,cl)*band*.55;
+  float dust=smoothstep(.4,.8,fbm(d*5.+3.));
+  vec3 s=stars(d)*(.55+band*1.4);
+  s+=vec3(.9,.85,.8)*pow(band,3.)*cl2*.05;
+  return (neb+s)*mix(1.,.5,dust*band);
+}
+vec3 bb(float t){ // ember -> white-hot
+  t=clamp(t,0.,1.6);
+  vec3 c=vec3(1.,.2+.55*t,.03+.55*t*t);
+  c=mix(c,vec3(1.,.93,.82),smoothstep(.9,1.6,t));
+  return c;
+}
+void main(){
+  vec2 uv=(gl_FragCoord.xy-.5*uRes)/uRes.y-uShift;
+  float yaw=uCam.x,pit=uCam.y,dist=uCam.z;
+  vec3 ro=dist*vec3(cos(pit)*sin(yaw),sin(pit),cos(pit)*cos(yaw));
+  vec3 fw=-normalize(ro);vec3 rt=normalize(cross(fw,vec3(0,1,0)));vec3 up=cross(rt,fw);
+  vec3 rd=normalize(fw+(uv.x*rt+uv.y*up)*uFov);
+  vec3 p=ro,v=rd;
+  vec3 hh=cross(p,v);float h2=dot(hh,hh);
+  vec3 col=vec3(0),aux=vec3(0);float tr=1.;
+  bool hit=false;
+  for(int i=0;i<300;i++){
+    float r2=dot(p,p),r=sqrt(r2);
+    if(r<1.0){hit=true;break;}
+    if(r>dist+14.&&dot(p,v)>0.)break;
+    float dt=clamp(.075*(r-.85)*(r>6.?1.:.7),.018,1.6);
+    // photon ring glow
+    float g=exp(-pow((r-1.52)*3.2,2.));
+    aux+=tr*vec3(1.,.78,.52)*g*dt*.05*uDisk;
+    v+=-1.5*h2*p/(r2*r2*r)*uLens*dt;
+    v=normalize(v);
+    vec3 pn=p+v*dt;
+    // thin haze above and below the disk
+    float rr0=length(p.xz);
+    if(rr0>RIN&&rr0<ROUT){
+      float hz=exp(-abs(p.y)*3.2)*pow(RIN/rr0,2.)*dt;
+      aux+=tr*vec3(1.,.55,.2)*hz*.016*uDisk;
+    }
+    if(p.y*pn.y<0.){
+      float t=p.y/(p.y-pn.y);
+      vec3 ip=mix(p,pn,t);
+      float rr=length(ip.xz);
+      if(rr>RIN&&rr<ROUT){
+        float rot=atan(ip.z,ip.x)-uTime*uSpd*.9*pow(rr,-1.5)*6.;
+        vec3 q=vec3(cos(rot)*3.5,sin(rot)*3.5,rr*3.2);
+        float dn=fbm(q)*.75+fbm(q*2.7+5.)*.45;
+        float edgeIn=smoothstep(RIN,RIN+.35,rr),edgeOut=1.-smoothstep(ROUT-5.,ROUT,rr);
+        float prof=pow(RIN/rr,2.1)*edgeIn*edgeOut;
+        float dens=clamp(.35+dn*1.1,0.,1.6);
+        // doppler + gravitational shift
+        vec3 tang=vec3(-ip.z,0.,ip.x)/rr;
+        float beta=clamp(sqrt(.5/(rr-1.)),0.,.72);
+        float D=sqrt(1.-beta*beta)/(1.-beta*dot(tang,-v));
+        D=mix(1.,D,uDop);
+        float gz=sqrt(max(1.-1./rr,.02));
+        float I=prof*dens*pow(D,3.2)*gz*2.6*uDisk;
+        float temp=pow(RIN/rr,.75)*pow(D,.7);
+        vec3 em=bb(temp*1.05)*I;
+        em=mix(em,em*vec3(.82,.93,1.15),clamp((D-1.)*1.2,0.,1.)); // blueshift tint
+        float a=clamp(prof*dens*1.5*uDisk,0.,.96);
+        col+=tr*em;
+        tr*=(1.-a);
+        if(tr<.01)break;
+      }
+    }
+    p=pn;
+  }
+  if(!hit){ col+=aux; if(tr>.01) col+=tr*sky(normalize(v))*1.15; }
+  o=vec4(col,1.);
+  // encode HDR into 8 bit
+  vec3 c=max(col,0.);vec3 s=sqrt(c/(4.+c));
+  o=vec4(s,hit?0.:1.);
+}
+</script>
+<script id="fs-post" type="x-shader/x-fragment">#version 300 es
+precision highp float;
+uniform sampler2D uTex;uniform vec2 uRes;uniform float uTime,uBloom;
+out vec4 o;
+vec3 dec(vec3 s){vec3 s2=s*s;return 4.*s2/max(1.-s2,.002);}
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
+void main(){
+  vec2 uv=gl_FragCoord.xy/uRes;
+  float asp=uRes.x/uRes.y;
+  vec2 cc=uv-.5;
+  float ab=dot(cc,cc)*.012;
+  vec3 base=vec3(dec(texture(uTex,uv-cc*ab).rgb).r,dec(texture(uTex,uv).rgb).g,dec(texture(uTex,uv+cc*ab).rgb).b);
+  vec3 bl=vec3(0);
+  float rnd=hash(gl_FragCoord.xy+uTime)*6.2832;
+  if(uBloom>0.){
+    for(int i=0;i<28;i++){
+      float fi=float(i)+.5;
+      float a=fi*2.39996+rnd;
+      float r1=sqrt(fi/28.);
+      vec2 d=vec2(cos(a),sin(a))*vec2(1./asp,1.);
+      vec3 s1=dec(texture(uTex,uv+d*r1*.014).rgb);
+      vec3 s2=dec(texture(uTex,uv+d*r1*.075).rgb);
+      bl+=max(s1-.85,0.)*(1.-r1*.5)*.9+max(s2-.7,0.)*.65;
+    }
+    bl/=28.;
+  }
+  float sm=smoothstep(.15,.85,texture(uTex,uv).a);
+  vec3 c=base+bl*uBloom*1.25*sm;
+  c=aces(c*1.18);
+  c=pow(c,vec3(1./2.2));
+  // grade: warm highlights, cool shadows
+  float l=dot(c,vec3(.299,.587,.114));
+  c=mix(c,c*vec3(1.04,1.0,.94),l)+vec3(-.004,0.,.012)*smoothstep(.03,.3,l)*(1.-l);
+  float vg=smoothstep(1.05,.25,length(cc*vec2(1.,1.1)));
+  c*=mix(.55,1.,vg);
+  c+=(hash(gl_FragCoord.xy*1.37+uTime*7.)-.5)*.022*smoothstep(.01,.2,l);
+  c=max(c-.006,0.);
+  o=vec4(c,1.);
+}
+</script>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const root = document.documentElement;
+$('#year').textContent = new Date().getFullYear();
+
+/* ---------- reveal motion ---------- */
+if (!RM && 'IntersectionObserver' in window) {
+  const targets = $$('.section-top,.stack-intro,.stack-row,.case,.archive-list li,.pg-intro,.hud,.about,.signal,.footer');
+  targets.forEach((n, i) => {
+    if (!n.matches('.case,.signal,.about,.section-top')) n.classList.add('reveal');
+    if (n.matches('.stack-row,.archive-list li')) n.style.setProperty('--d', (i % 4) * 85 + 'ms');
+  });
+  root.classList.add('motion-on');
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -9% 0px', threshold: .06 });
+  targets.forEach(n => io.observe(n));
+}
+
+/* ---------- blackhole parameters (fixed) ---------- */
+const T = { dist: 32, pitch: 6, lens: 1, dop: .3, disk: 1, spd: 1, bloom: 1 };
+if (RM) { T.spd = .12; }
+
+/* ---------- scroll → camera ---------- */
+// [yaw, pitch, distance, shiftX, shiftY]; shift moves the hole on screen (x: right+, y: up+)
+const defs = [
+  ['#top',        [0.0, .10, 38,  .30,  0.0]],
+  ['#stack',      [0.7, .30, 50, -.34,  .08]],
+  ['#case-1',     [1.3, .16, 28,  .32, -.04]],
+  ['#case-2',     [1.9, .42, 22,  0.0,  0.0]],
+  ['#case-3',     [2.5, .05, 21, -.30,  .05]],
+  ['#playground', 'sim'],
+  ['#archive',    [3.4, .34, 56,  0.0,  .20]]
+].map(([sel, cam]) => ({ el: $(sel), cam, top: 0, mid: 0 }));
+const wide = () => innerWidth / innerHeight > 1.05;
+function measure() {
+  defs.forEach(d => { const r = d.el.getBoundingClientRect(); d.top = r.top + scrollY; d.mid = d.top + r.height / 2; });
+  // hero anchors to its top part so the first screen shows the hole large
+  defs[0].mid = Math.min(defs[0].mid, defs[0].top + innerHeight * .5);
+}
+function camOf(d) {
+  let c = d.cam;
+  if (c === 'sim') c = [0, T.pitch * Math.PI / 180, T.dist, .30, 0];
+  c = c.slice();
+  if (!wide()) { c[3] = 0; c[4] = d.el.id === 'top' || d.el.id === 'playground' ? .27 : .24; }
+  return c;
+}
+let scrollF = 0;
+function computeCam() {
+  const y = scrollY + innerHeight * .5;
+  let i = 0;
+  for (let k = 0; k < defs.length; k++) if (defs[k].mid <= y) i = k;
+  const a = defs[i], b = defs[Math.min(i + 1, defs.length - 1)];
+  let w = 0;
+  if (b !== a && y > a.mid) w = sstep(.2, .8, (y - a.mid) / Math.max(1, b.mid - a.mid));
+  if (y < defs[0].mid) w = 0;
+  scrollF = i + w;
+  const ca = camOf(a), cb = camOf(b);
+  return ca.map((v, n) => lerp(v, cb[n], w));
+}
+
+/* progress bar / nav state / hero drift */
+const bar = $('.page-progress span');
+const navLinks = $$('.links a[href^="#"]');
+const segs = ['stack', 'selected', 'playground', 'archive', 'about'].map(id => document.getElementById(id));
+let rafScroll = false;
+function onScroll() {
+  rafScroll = false;
+  const y = scrollY, max = Math.max(1, root.scrollHeight - innerHeight);
+  bar.style.transform = 'scaleX(' + clamp(y / max, 0, 1) + ')';
+  if (!RM && innerWidth > 660) root.style.setProperty('--hero-drift', clamp(y * .09, 0, 86) + 'px');
+  let active = null;
+  segs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .45) active = s.id; });
+  navLinks.forEach(a => a.getAttribute('href') === '#' + active ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'));
+}
+const reqScroll = () => { if (!rafScroll) { rafScroll = true; requestAnimationFrame(onScroll); } };
+addEventListener('scroll', reqScroll, { passive: true });
+addEventListener('resize', () => { measure(); reqScroll(); }, { passive: true });
+if ('ResizeObserver' in window) new ResizeObserver(measure).observe(document.body);
+addEventListener('load', measure);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+measure(); onScroll();
+
+/* drag orbit (background blackhole, empty space only) */
+let dragYaw = 0, dragPit = 0, dragging = false, lx = 0, ly = 0, mx = 0, my = 0;
+addEventListener('pointerdown', e => {
+  if (e.target.closest('a,button,input,nav,header,.section-top,p,h1,h2,h3,h4,h5,h6,li,small,code,.hero-title')) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  dragging = true; lx = e.clientX; ly = e.clientY;
+});
+addEventListener('pointermove', e => {
+  mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5;
+  if (!dragging) return;
+  dragYaw -= (e.clientX - lx) * .005; dragPit = clamp(dragPit + (e.clientY - ly) * .004, -1.2, 1.2);
+  lx = e.clientX; ly = e.clientY;
+});
+const endDrag = () => { dragging = false; };
+addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
+
+/* ---------- WebGL ---------- */
+const canvas = $('#gl');
+const boot = $('#boot');
+const finishBoot = () => setTimeout(() => boot.classList.add('done'), 900);
+const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' });
+if (!gl) { document.body.classList.add('no-gl'); finishBoot(); return; }
+const compile = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src.trim()); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+const prog = (vs, fs) => { const p = gl.createProgram(); gl.attachShader(p, compile(gl.VERTEX_SHADER, vs)); gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs)); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); for (let i = 0; i < n; i++) { const nm = gl.getActiveUniform(p, i).name; u[nm] = gl.getUniformLocation(p, nm); } return { p, u }; };
+let S, Q;
+try { const vs = $('#vs').textContent; S = prog(vs, $('#fs-scene').textContent); Q = prog(vs, $('#fs-post').textContent); }
+catch (err) { console.error(err); document.body.classList.add('no-gl'); finishBoot(); return; }
+const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+const tex = gl.createTexture(), fbo = gl.createFramebuffer();
+let sw = 0, sh = 0, quality = .7;
+const dprCap = Math.min(devicePixelRatio || 1, 1.5);
+function resize() {
+  const cw = Math.max(2, Math.floor(innerWidth * dprCap)), ch = Math.max(2, Math.floor(innerHeight * dprCap));
+  if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+  const nw = Math.max(2, Math.round(cw * quality)), nh = Math.max(2, Math.round(ch * quality));
+  if (nw !== sw || nh !== sh) {
+    sw = nw; sh = nh;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sw, sh, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+  }
+}
+
+const C = { yaw: 0, pit: .1, dist: 38, sx: .3, sy: 0, lens: 1, dop: .3, disk: 1, bloom: 1 };
+let first = true, phase = 0, last = performance.now(), acc = 0, frames = 0, fps = 60, lowS = 0, highS = 0, telTimer = 0;
+const els = { r: $$('[data-t=r]'), dil: $$('[data-t=dil]'), fps: $$('[data-t=fps]'), esc: $$('[data-t=esc]') };
+const setT = (k, v) => els[k].forEach(e => e.textContent = v);
+let spdC = 1;
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  acc += dt; frames++;
+  if (acc > .5) {
+    fps = frames / acc; acc = 0; frames = 0;
+    if (fps < 40) { lowS++; highS = 0; } else if (fps > 56) { highS++; lowS = 0; } else { lowS = highS = 0; }
+    if (lowS >= 1 && quality > .38) { quality = Math.max(.38, quality - .08); lowS = 0; }
+    if (highS >= 4 && quality < 1) { quality = Math.min(1, quality + .06); highS = 0; }
+  }
+  const k = computeCam();
+  if (!dragging) { const f = Math.pow(.02, dt); dragYaw *= f; dragPit *= f; }
+  const tgt = { yaw: k[0] + dragYaw + mx * .05, pit: k[1] + dragPit - my * .03, dist: k[2], sx: k[3], sy: k[4], lens: T.lens, dop: T.dop, disk: T.disk, bloom: T.bloom };
+  const e = first ? 1 : 1 - Math.pow(.0009, dt);
+  for (const n in tgt) C[n] = lerp(C[n], tgt[n], n === 'yaw' && dragging ? .5 : e);
+  spdC = lerp(spdC, T.spd, e);
+  first = false;
+  phase += dt * spdC;
+
+  resize();
+  gl.useProgram(S.p);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+  gl.viewport(0, 0, sw, sh);
+  gl.uniform2f(S.u.uRes, sw, sh);
+  gl.uniform1f(S.u.uTime, phase);
+  gl.uniform3f(S.u.uCam, C.yaw, C.pit, C.dist);
+  gl.uniform2f(S.u.uShift, C.sx, C.sy);
+  gl.uniform1f(S.u.uLens, C.lens); gl.uniform1f(S.u.uDisk, C.disk); gl.uniform1f(S.u.uDop, C.dop);
+  gl.uniform1f(S.u.uSpd, 1); gl.uniform1f(S.u.uFov, wide() ? .6 : 1.5);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  gl.useProgram(Q.p);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.uniform1i(Q.u.uTex, 0);
+  gl.uniform2f(Q.u.uRes, canvas.width, canvas.height);
+  gl.uniform1f(Q.u.uTime, (now / 1000) % 100);
+  gl.uniform1f(Q.u.uBloom, C.bloom);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  telTimer += dt;
+}
+resize();
+requestAnimationFrame(t => { last = t; frame(t); });
+finishBoot();
+})();
+</script>
+</body>
+</html>
