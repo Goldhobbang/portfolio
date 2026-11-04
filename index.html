@@ -2,13 +2,94 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<!--
+  ABYSS 원터치 설정 — intensity 숫자 하나 수정 → 저장 → 새로고침
+  0.5: 차분하게 / 1: 현재 기본 / 1.5: 활발하게 / 2: 강하게 (범위 0.25~3)
+  개체 수·유영·회피·선회·꼬리 박동·반응 범위·입자가 수식으로 함께 바뀝니다.
+  아래 상세 항목은 intensity=1일 때의 기준값입니다. 보통은 수정할 필요 없습니다.
+  population: 상어 수 / 깊이별 아귀 수 / 전방위 배치 방향 수 (bearings=4: 전후좌우)
+  motion: 속도·가속·선회·상하 운동 (값이 클수록 강함, Decay는 클수록 빨리 감속)
+  swim: 꼬리 박동 빈도·진폭 배율 / 활공 시 진폭 감소율(0~1)
+  interaction: 회피 반경(짧은 화면 변 길이 대비), 클릭 판정(ms), 시점 감도
+  lighting: 광량·빔 폭·거리 / scene: 안개·화질·수심·입자
+  각도는 라디안(0.36 ≈ 20.6°), 거리는 장면 단위, 속도는 초 기준입니다.
+  JSON 형식이므로 마지막 항목 뒤 쉼표나 블록 내부 주석은 넣지 마세요.
+-->
+<script id="abyss-config" type="application/json">
+{
+  "intensity": 1.6,
+  "population": {
+    "sharks": 56,
+    "anglers": 9,
+    "bearings": 4,
+    "canopy": true
+  },
+  "motion": {
+    "timeScale": 1,
+    "sharkCruiseSpeed": 2.1,
+    "sharkEscapeBoost": 15,
+    "sharkEscapeDuration": 4,
+    "sharkBurstDelay": 0.085,
+    "sharkBurstDecay": 1.35,
+    "sharkEscapeResponseDecay": 1.45,
+    "sharkTurnSpeed": 1.6,
+    "sharkEscapeTurnSpeed": 5.8,
+    "sharkVerticalMotion": 2.2,
+    "sharkVerticalWeave": 0.45,
+    "sharkPitchLimit": 0.36,
+    "sharkBankLimit": 0.32,
+    "anglerSwimSpeed": 1.6,
+    "anglerEscapeSpeed": 18,
+    "anglerEscapeDecay": 1.4
+  },
+  "swim": {
+    "frequencyMultiplier": 1,
+    "amplitudeMultiplier": 1,
+    "glideReduction": 0.88
+  },
+  "interaction": {
+    "scareRadius": 0.52,
+    "clickMaxMs": 360,
+    "dragThreshold": 8,
+    "lookSensitivity": 0.003,
+    "verticalMargin": 0.025,
+    "lampKey": "KeyF"
+  },
+  "lighting": {
+    "power": 0.85,
+    "beamWidth": 0.55,
+    "range": 62,
+    "aimDistance": 18,
+    "response": 5.5,
+    "aimResponse": 8,
+    "ambientDark": 0.1,
+    "ambientLit": 0.22,
+    "bloom": true
+  },
+  "scene": {
+    "fogDensity": 0.046,
+    "exposure": 1.18,
+    "pixelRatioLimit": 1.5,
+    "maxDepth": 80,
+    "snowCount": 1500,
+    "snowSize": 0.075,
+    "snowSpeed": 0.045,
+    "particleSpan": 60,
+    "particleHeight": 36
+  }
+}
+</script>
+<script>
+const ABYSS_CONFIG = JSON.parse(document.getElementById('abyss-config').textContent);
+// 모든 모듈과 스튜디오는 위의 동일한 설정 블록을 읽습니다.
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090a">
-<meta name="description" content="GoldHobbang — 실제로 만든 개발 도구와 소프트웨어를 기록합니다. 배경은 실시간으로 계산되는 블랙홀 시뮬레이션입니다.">
+<meta name="theme-color" content="#05080c">
+<meta name="description" content="GoldHobbang — 심해. 손전등을 켜면 거대 어류가 빛 속을 지나갑니다.">
 <meta property="og:title" content="GoldHobbang — Code, made tangible.">
 <meta property="og:description" content="검색 인프라, 개발 도구, 브라우저 편집기, 한국어 분석 및 데이터 연구의 기록.">
 <meta property="og:type" content="website">
-<title>GoldHobbang — Project Index</title>
+<title>GoldHobbang — Abyss</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,7 +117,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 
 /* ---- background ---- */
 #gl{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0}
-#fallback{position:fixed;inset:0;z-index:0;display:none;background:radial-gradient(circle at 70% 46%,#000 0 8%,#ff9a3c 9.5%,#6a2e0c 15%,transparent 30%),var(--void)}
+#fallback{position:fixed;inset:0;z-index:0;display:none;background:radial-gradient(circle at 50% 38%,#12343a 0%,#071018 46%,#05070a 72%),#05070a}
 .no-gl #fallback{display:block}.no-gl #gl{display:none}
 #boot{position:fixed;inset:0;z-index:300;background:var(--void);display:grid;place-items:center;transition:opacity 1.2s ease .15s,visibility 0s 1.5s}
 #boot.done{opacity:0;visibility:hidden}
@@ -132,35 +213,6 @@ main{position:relative;z-index:2}
 .pg-intro{margin-bottom:22px;text-shadow:0 0 22px rgba(0,0,0,.85)}
 .pg-intro p{margin:0;font-size:14px;line-height:1.85;color:#e0e3e1;word-break:keep-all}
 .pg-intro p+p{margin-top:10px;color:var(--muted);font-size:13px}
-.hud{background:var(--glass);border:1px solid rgba(244,243,240,.22);padding:22px 22px 18px;backdrop-filter:blur(20px) saturate(1.2);-webkit-backdrop-filter:blur(20px) saturate(1.2);box-shadow:0 30px 80px rgba(0,0,0,.55)}
-.hud header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
-.hud h3{font:400 15px var(--head);letter-spacing:-.04em;margin:0}
-.live{font:500 10px var(--mono);letter-spacing:.16em;color:var(--orange);display:flex;align-items:center;gap:8px}
-.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 1.6s infinite}
-@keyframes pulse{50%{opacity:.25}}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
-.chip{font:500 11px var(--ko);padding:7px 11px;border:1px solid var(--rule);color:#d0d4d2;transition:.2s}
-.chip:hover{border-color:var(--ink);color:var(--ink)}.chip.on{background:var(--ink);color:var(--void);border-color:var(--ink)}
-.ctl{margin-bottom:15px}
-.ctl label{display:flex;justify-content:space-between;font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
-.ctl output{color:var(--ink)}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;margin:0}
-input[type=range]::-webkit-slider-runnable-track{height:2px;background:linear-gradient(90deg,var(--orange) var(--p,50%),rgba(244,243,240,.22) var(--p,50%))}
-input[type=range]::-moz-range-track{height:2px;background:rgba(244,243,240,.22)}
-input[type=range]::-moz-range-progress{height:2px;background:var(--orange)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:var(--ink);margin-top:-5px;border:0;border-radius:0;transition:background .2s,transform .2s}
-input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:0;background:var(--ink)}
-input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-slider-thumb{background:var(--orange);transform:scale(1.25)}
-.tog{display:flex;justify-content:space-between;align-items:center;font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--muted)}
-.sw{width:38px;height:20px;border:1px solid var(--rule);position:relative;transition:.25s}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;background:var(--muted);transition:.25s}
-.sw[aria-pressed=true]{border-color:var(--orange)}.sw[aria-pressed=true]::after{left:21px;background:var(--orange)}
-.telem{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin:18px 0 0}
-.telem div{background:rgba(8,9,10,.85);padding:10px 12px}
-.telem dt{font:500 9.5px var(--mono);letter-spacing:.1em;color:var(--muted)}
-.telem dd{margin:2px 0 0;font:500 14px var(--mono);font-variant-numeric:tabular-nums}
-.hint{margin:14px 0 0;font:500 10px var(--mono);letter-spacing:.1em;color:var(--muted)}
-
 /* ---- index ---- */
 .archive{padding-bottom:clamp(110px,12vw,190px)}
 .archive-list{list-style:none;margin:0;padding:0;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
@@ -234,9 +286,9 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 </style>
 </head>
 <body>
-<canvas id="gl" role="img" aria-label="실시간으로 렌더링되는 블랙홀 배경"></canvas>
+<canvas id="gl" role="img" aria-label="어두운 심해. 손전등을 켜면 빛 속에서 거대 물고기가 지나갑니다."></canvas>
 <div id="fallback"></div>
-<div id="boot"><div><b>GH<i>/</i></b><u></u>RAY TRACING</div></div>
+<div id="boot"><div><b>GH<i>/</i></b><u></u>ABYSS</div></div>
 <div class="page-progress" aria-hidden="true"><span></span></div>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 
@@ -277,12 +329,16 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 
 <section class="playground inner" id="playground" aria-labelledby="pg-heading">
   <div class="section-top"><h2 id="pg-heading">PLAYGROUND.</h2></div>
-  <div class="pg-intro">
-    <p>이 페이지 뒤의 블랙홀은 이미지가 아니라 WebGL2 셰이더가 매 프레임 계산하는 시뮬레이션입니다. 화면의 픽셀마다 광선 하나를 중력으로 휘며 추적합니다.</p>
-    <p>회전하지 않는 블랙홀(슈바르츠실트) 근사이며, 색과 밝기에는 연출이 포함됩니다. 빈 곳을 드래그하면 블랙홀 주위를 돌 수 있습니다.</p>
-    <p><a class="inline-link" href="./abyss.html">ABYSS · 심해 탐험 ↗</a></p>
+  <div class="pg-col">
+    <div class="pg-intro">
+      <p>어둠 속에서 심해아귀가 부유하고, 긴 몸의 생물이 물결치며 지나갑니다. 손전등으로 가까운 생물의 모습을 살펴보세요.</p>
+      <p>빈 배경을 짧게 누르면 주변 물고기가 놀라 도망갑니다. <span data-lamp-key>F</span> 키를 누르는 동안 손전등이 켜지고, 커서 방향을 비춥니다. 마우스나 터치 드래그로 위·아래와 뒤쪽까지 360° 둘러보세요. 어둠 속에서도 아귀의 미끼는 빛납니다.</p>
+    </div>
+
   </div>
 </section>
+
+
 
 <section class="archive inner" id="archive" aria-labelledby="archive-heading">
   <div class="section-top"><h2 id="archive-heading">THE INDEX.</h2></div>
@@ -303,354 +359,7 @@ input[type=range]:hover::-webkit-slider-thumb,input[type=range]:active::-webkit-
 </main>
 <footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="#top">BACK TO TOP ↑</a></footer>
 
-<script id="vs" type="x-shader/x-vertex">#version 300 es
-in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}
-</script>
-<script id="fs-scene" type="x-shader/x-fragment">#version 300 es
-precision highp float;
-uniform vec2 uRes;uniform float uTime;uniform vec3 uCam;uniform vec2 uShift;
-uniform float uLens,uDisk,uDop,uSpd,uFov;
-out vec4 o;
-const float RIN=3.0,ROUT=13.0;
 
-float h13(vec3 p){p=fract(p*.1031);p+=dot(p,p.zyx+31.32);return fract((p.x+p.y)*p.z);}
-vec3 h33(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.xxy+p.yxx)*p.zyx);}
-float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
-  return mix(mix(mix(h13(i),h13(i+vec3(1,0,0)),f.x),mix(h13(i+vec3(0,1,0)),h13(i+vec3(1,1,0)),f.x),f.y),
-             mix(mix(h13(i+vec3(0,0,1)),h13(i+vec3(1,0,1)),f.x),mix(h13(i+vec3(0,1,1)),h13(i+vec3(1,1,1)),f.x),f.y),f.z);}
-float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*vn(p);p=p*2.03+7.1;a*=.5;}return s;}
 
-vec3 starTint(float t){return mix(vec3(.7,.82,1.),vec3(1.,.82,.62),t);}
-vec3 stars(vec3 d){
-  vec3 c=vec3(0);
-  for(int i=0;i<3;i++){
-    float s=90.+float(i)*85.;
-    vec3 q=d*s,id=floor(q),f=fract(q)-.5;
-    float h=h13(id+float(i)*19.7);
-    if(h>.955){
-      vec3 off=(h33(id)-.5)*.55;
-      float dist=length(f-off);
-      float b=(h-.955)/.045;
-      float st=smoothstep(.2,0.,dist)*(.25+b*b*2.2);
-      c+=st*starTint(h33(id+3.).x);
-    }
-  }
-  return c;
-}
-vec3 sky(vec3 d){
-  vec3 n=normalize(vec3(.35,.82,-.45));
-  float band=exp(-pow(dot(d,n)*3.2,2.));
-  float cl=fbm(d*3.2+vec3(2.));
-  float cl2=fbm(d*7.5+vec3(11.));
-  vec3 neb=mix(vec3(.05,.07,.15),vec3(.2,.1,.08),cl2)*smoothstep(.35,.9,cl)*band*.55;
-  float dust=smoothstep(.4,.8,fbm(d*5.+3.));
-  vec3 s=stars(d)*(.55+band*1.4);
-  s+=vec3(.9,.85,.8)*pow(band,3.)*cl2*.05;
-  return (neb+s)*mix(1.,.5,dust*band);
-}
-vec3 bb(float t){ // ember -> white-hot
-  t=clamp(t,0.,1.6);
-  vec3 c=vec3(1.,.2+.55*t,.03+.55*t*t);
-  c=mix(c,vec3(1.,.93,.82),smoothstep(.9,1.6,t));
-  return c;
-}
-void main(){
-  vec2 uv=(gl_FragCoord.xy-.5*uRes)/uRes.y-uShift;
-  float yaw=uCam.x,pit=uCam.y,dist=uCam.z;
-  vec3 ro=dist*vec3(cos(pit)*sin(yaw),sin(pit),cos(pit)*cos(yaw));
-  vec3 fw=-normalize(ro);vec3 rt=normalize(cross(fw,vec3(0,1,0)));vec3 up=cross(rt,fw);
-  vec3 rd=normalize(fw+(uv.x*rt+uv.y*up)*uFov);
-  vec3 p=ro,v=rd;
-  vec3 hh=cross(p,v);float h2=dot(hh,hh);
-  vec3 col=vec3(0),aux=vec3(0);float tr=1.;
-  bool hit=false;
-  for(int i=0;i<300;i++){
-    float r2=dot(p,p),r=sqrt(r2);
-    if(r<1.0){hit=true;break;}
-    if(r>dist+14.&&dot(p,v)>0.)break;
-    float dt=clamp(.075*(r-.85)*(r>6.?1.:.7),.018,1.6);
-    // photon ring glow
-    float g=exp(-pow((r-1.52)*3.2,2.));
-    aux+=tr*vec3(1.,.78,.52)*g*dt*.05*uDisk;
-    v+=-1.5*h2*p/(r2*r2*r)*uLens*dt;
-    v=normalize(v);
-    vec3 pn=p+v*dt;
-    // thin haze above and below the disk
-    float rr0=length(p.xz);
-    if(rr0>RIN&&rr0<ROUT){
-      float hz=exp(-abs(p.y)*3.2)*pow(RIN/rr0,2.)*dt;
-      aux+=tr*vec3(1.,.55,.2)*hz*.016*uDisk;
-    }
-    if(p.y*pn.y<0.){
-      float t=p.y/(p.y-pn.y);
-      vec3 ip=mix(p,pn,t);
-      float rr=length(ip.xz);
-      if(rr>RIN&&rr<ROUT){
-        float rot=atan(ip.z,ip.x)-uTime*uSpd*.9*pow(rr,-1.5)*6.;
-        vec3 q=vec3(cos(rot)*3.5,sin(rot)*3.5,rr*3.2);
-        float dn=fbm(q)*.75+fbm(q*2.7+5.)*.45;
-        float edgeIn=smoothstep(RIN,RIN+.35,rr),edgeOut=1.-smoothstep(ROUT-5.,ROUT,rr);
-        float prof=pow(RIN/rr,2.1)*edgeIn*edgeOut;
-        float dens=clamp(.35+dn*1.1,0.,1.6);
-        // doppler + gravitational shift
-        vec3 tang=vec3(-ip.z,0.,ip.x)/rr;
-        float beta=clamp(sqrt(.5/(rr-1.)),0.,.72);
-        float D=sqrt(1.-beta*beta)/(1.-beta*dot(tang,-v));
-        D=mix(1.,D,uDop);
-        float gz=sqrt(max(1.-1./rr,.02));
-        float I=prof*dens*pow(D,3.2)*gz*2.6*uDisk;
-        float temp=pow(RIN/rr,.75)*pow(D,.7);
-        vec3 em=bb(temp*1.05)*I;
-        em=mix(em,em*vec3(.82,.93,1.15),clamp((D-1.)*1.2,0.,1.)); // blueshift tint
-        float a=clamp(prof*dens*1.5*uDisk,0.,.96);
-        col+=tr*em;
-        tr*=(1.-a);
-        if(tr<.01)break;
-      }
-    }
-    p=pn;
-  }
-  if(!hit){ col+=aux; if(tr>.01) col+=tr*sky(normalize(v))*1.15; }
-  o=vec4(col,1.);
-  // encode HDR into 8 bit
-  vec3 c=max(col,0.);vec3 s=sqrt(c/(4.+c));
-  o=vec4(s,hit?0.:1.);
-}
-</script>
-<script id="fs-post" type="x-shader/x-fragment">#version 300 es
-precision highp float;
-uniform sampler2D uTex;uniform vec2 uRes;uniform float uTime,uBloom;
-out vec4 o;
-vec3 dec(vec3 s){vec3 s2=s*s;return 4.*s2/max(1.-s2,.002);}
-float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
-vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
-void main(){
-  vec2 uv=gl_FragCoord.xy/uRes;
-  float asp=uRes.x/uRes.y;
-  vec2 cc=uv-.5;
-  float ab=dot(cc,cc)*.012;
-  vec3 base=vec3(dec(texture(uTex,uv-cc*ab).rgb).r,dec(texture(uTex,uv).rgb).g,dec(texture(uTex,uv+cc*ab).rgb).b);
-  vec3 bl=vec3(0);
-  float rnd=hash(gl_FragCoord.xy+uTime)*6.2832;
-  if(uBloom>0.){
-    for(int i=0;i<28;i++){
-      float fi=float(i)+.5;
-      float a=fi*2.39996+rnd;
-      float r1=sqrt(fi/28.);
-      vec2 d=vec2(cos(a),sin(a))*vec2(1./asp,1.);
-      vec3 s1=dec(texture(uTex,uv+d*r1*.014).rgb);
-      vec3 s2=dec(texture(uTex,uv+d*r1*.075).rgb);
-      bl+=max(s1-.85,0.)*(1.-r1*.5)*.9+max(s2-.7,0.)*.65;
-    }
-    bl/=28.;
-  }
-  float sm=smoothstep(.15,.85,texture(uTex,uv).a);
-  vec3 c=base+bl*uBloom*1.25*sm;
-  c=aces(c*1.18);
-  c=pow(c,vec3(1./2.2));
-  // grade: warm highlights, cool shadows
-  float l=dot(c,vec3(.299,.587,.114));
-  c=mix(c,c*vec3(1.04,1.0,.94),l)+vec3(-.004,0.,.012)*smoothstep(.03,.3,l)*(1.-l);
-  float vg=smoothstep(1.05,.25,length(cc*vec2(1.,1.1)));
-  c*=mix(.55,1.,vg);
-  c+=(hash(gl_FragCoord.xy*1.37+uTime*7.)-.5)*.022*smoothstep(.01,.2,l);
-  c=max(c-.006,0.);
-  o=vec4(c,1.);
-}
-</script>
-
-<script>
-(() => {
-'use strict';
-const $ = (s, r = document) => r.querySelector(s);
-const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const lerp = (a, b, t) => a + (b - a) * t;
-const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
-const root = document.documentElement;
-$('#year').textContent = new Date().getFullYear();
-
-/* ---------- reveal motion ---------- */
-if (!RM && 'IntersectionObserver' in window) {
-  const targets = $$('.section-top,.stack-intro,.stack-row,.case,.archive-list li,.pg-intro,.hud,.about,.signal,.footer');
-  targets.forEach((n, i) => {
-    if (!n.matches('.case,.signal,.about,.section-top')) n.classList.add('reveal');
-    if (n.matches('.stack-row,.archive-list li')) n.style.setProperty('--d', (i % 4) * 85 + 'ms');
-  });
-  root.classList.add('motion-on');
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -9% 0px', threshold: .06 });
-  targets.forEach(n => io.observe(n));
-}
-
-/* ---------- blackhole parameters (fixed) ---------- */
-const T = { dist: 32, pitch: 6, lens: 1, dop: .3, disk: 1, spd: 1, bloom: 1 };
-if (RM) { T.spd = .12; }
-
-/* ---------- scroll → camera ---------- */
-// [yaw, pitch, distance, shiftX, shiftY]; shift moves the hole on screen (x: right+, y: up+)
-const defs = [
-  ['#top',        [0.0, .10, 38,  .30,  0.0]],
-  ['#stack',      [0.7, .30, 50, -.34,  .08]],
-  ['#case-1',     [1.3, .16, 28,  .32, -.04]],
-  ['#case-2',     [1.9, .42, 22,  0.0,  0.0]],
-  ['#case-3',     [2.5, .05, 21, -.30,  .05]],
-  ['#playground', 'sim'],
-  ['#archive',    [3.4, .34, 56,  0.0,  .20]]
-].map(([sel, cam]) => ({ el: $(sel), cam, top: 0, mid: 0 }));
-const wide = () => innerWidth / innerHeight > 1.05;
-function measure() {
-  defs.forEach(d => { const r = d.el.getBoundingClientRect(); d.top = r.top + scrollY; d.mid = d.top + r.height / 2; });
-  // hero anchors to its top part so the first screen shows the hole large
-  defs[0].mid = Math.min(defs[0].mid, defs[0].top + innerHeight * .5);
-}
-function camOf(d) {
-  let c = d.cam;
-  if (c === 'sim') c = [0, T.pitch * Math.PI / 180, T.dist, .30, 0];
-  c = c.slice();
-  if (!wide()) { c[3] = 0; c[4] = d.el.id === 'top' || d.el.id === 'playground' ? .27 : .24; }
-  return c;
-}
-let scrollF = 0;
-function computeCam() {
-  const y = scrollY + innerHeight * .5;
-  let i = 0;
-  for (let k = 0; k < defs.length; k++) if (defs[k].mid <= y) i = k;
-  const a = defs[i], b = defs[Math.min(i + 1, defs.length - 1)];
-  let w = 0;
-  if (b !== a && y > a.mid) w = sstep(.2, .8, (y - a.mid) / Math.max(1, b.mid - a.mid));
-  if (y < defs[0].mid) w = 0;
-  scrollF = i + w;
-  const ca = camOf(a), cb = camOf(b);
-  return ca.map((v, n) => lerp(v, cb[n], w));
-}
-
-/* progress bar / nav state / hero drift */
-const bar = $('.page-progress span');
-const navLinks = $$('.links a[href^="#"]');
-const segs = ['stack', 'selected', 'playground', 'archive', 'about'].map(id => document.getElementById(id));
-let rafScroll = false;
-function onScroll() {
-  rafScroll = false;
-  const y = scrollY, max = Math.max(1, root.scrollHeight - innerHeight);
-  bar.style.transform = 'scaleX(' + clamp(y / max, 0, 1) + ')';
-  if (!RM && innerWidth > 660) root.style.setProperty('--hero-drift', clamp(y * .09, 0, 86) + 'px');
-  let active = null;
-  segs.forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .45) active = s.id; });
-  navLinks.forEach(a => a.getAttribute('href') === '#' + active ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'));
-}
-const reqScroll = () => { if (!rafScroll) { rafScroll = true; requestAnimationFrame(onScroll); } };
-addEventListener('scroll', reqScroll, { passive: true });
-addEventListener('resize', () => { measure(); reqScroll(); }, { passive: true });
-if ('ResizeObserver' in window) new ResizeObserver(measure).observe(document.body);
-addEventListener('load', measure);
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-measure(); onScroll();
-
-/* drag orbit (background blackhole, empty space only) */
-let dragYaw = 0, dragPit = 0, dragging = false, lx = 0, ly = 0, mx = 0, my = 0;
-addEventListener('pointerdown', e => {
-  if (e.target.closest('a,button,input,nav,header,.section-top,p,h1,h2,h3,h4,h5,h6,li,small,code,.hero-title')) return;
-  if (e.pointerType === 'mouse' && e.button !== 0) return;
-  dragging = true; lx = e.clientX; ly = e.clientY;
-});
-addEventListener('pointermove', e => {
-  mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5;
-  if (!dragging) return;
-  dragYaw -= (e.clientX - lx) * .005; dragPit = clamp(dragPit + (e.clientY - ly) * .004, -1.2, 1.2);
-  lx = e.clientX; ly = e.clientY;
-});
-const endDrag = () => { dragging = false; };
-addEventListener('pointerup', endDrag); addEventListener('pointercancel', endDrag);
-
-/* ---------- WebGL ---------- */
-const canvas = $('#gl');
-const boot = $('#boot');
-const finishBoot = () => setTimeout(() => boot.classList.add('done'), 900);
-const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' });
-if (!gl) { document.body.classList.add('no-gl'); finishBoot(); return; }
-const compile = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src.trim()); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
-const prog = (vs, fs) => { const p = gl.createProgram(); gl.attachShader(p, compile(gl.VERTEX_SHADER, vs)); gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs)); gl.bindAttribLocation(p, 0, 'p'); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); const u = {}; const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); for (let i = 0; i < n; i++) { const nm = gl.getActiveUniform(p, i).name; u[nm] = gl.getUniformLocation(p, nm); } return { p, u }; };
-let S, Q;
-try { const vs = $('#vs').textContent; S = prog(vs, $('#fs-scene').textContent); Q = prog(vs, $('#fs-post').textContent); }
-catch (err) { console.error(err); document.body.classList.add('no-gl'); finishBoot(); return; }
-const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-
-const tex = gl.createTexture(), fbo = gl.createFramebuffer();
-let sw = 0, sh = 0, quality = .7;
-const dprCap = Math.min(devicePixelRatio || 1, 1.5);
-function resize() {
-  const cw = Math.max(2, Math.floor(innerWidth * dprCap)), ch = Math.max(2, Math.floor(innerHeight * dprCap));
-  if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
-  const nw = Math.max(2, Math.round(cw * quality)), nh = Math.max(2, Math.round(ch * quality));
-  if (nw !== sw || nh !== sh) {
-    sw = nw; sh = nh;
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, sw, sh, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-  }
-}
-
-const C = { yaw: 0, pit: .1, dist: 38, sx: .3, sy: 0, lens: 1, dop: .3, disk: 1, bloom: 1 };
-let first = true, phase = 0, last = performance.now(), acc = 0, frames = 0, fps = 60, lowS = 0, highS = 0, telTimer = 0;
-const els = { r: $$('[data-t=r]'), dil: $$('[data-t=dil]'), fps: $$('[data-t=fps]'), esc: $$('[data-t=esc]') };
-const setT = (k, v) => els[k].forEach(e => e.textContent = v);
-let spdC = 1;
-
-function frame(now) {
-  requestAnimationFrame(frame);
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  acc += dt; frames++;
-  if (acc > .5) {
-    fps = frames / acc; acc = 0; frames = 0;
-    if (fps < 40) { lowS++; highS = 0; } else if (fps > 56) { highS++; lowS = 0; } else { lowS = highS = 0; }
-    if (lowS >= 1 && quality > .38) { quality = Math.max(.38, quality - .08); lowS = 0; }
-    if (highS >= 4 && quality < 1) { quality = Math.min(1, quality + .06); highS = 0; }
-  }
-  const k = computeCam();
-  if (!dragging) { const f = Math.pow(.02, dt); dragYaw *= f; dragPit *= f; }
-  const tgt = { yaw: k[0] + dragYaw + mx * .05, pit: k[1] + dragPit - my * .03, dist: k[2], sx: k[3], sy: k[4], lens: T.lens, dop: T.dop, disk: T.disk, bloom: T.bloom };
-  const e = first ? 1 : 1 - Math.pow(.0009, dt);
-  for (const n in tgt) C[n] = lerp(C[n], tgt[n], n === 'yaw' && dragging ? .5 : e);
-  spdC = lerp(spdC, T.spd, e);
-  first = false;
-  phase += dt * spdC;
-
-  resize();
-  gl.useProgram(S.p);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-  gl.viewport(0, 0, sw, sh);
-  gl.uniform2f(S.u.uRes, sw, sh);
-  gl.uniform1f(S.u.uTime, phase);
-  gl.uniform3f(S.u.uCam, C.yaw, C.pit, C.dist);
-  gl.uniform2f(S.u.uShift, C.sx, C.sy);
-  gl.uniform1f(S.u.uLens, C.lens); gl.uniform1f(S.u.uDisk, C.disk); gl.uniform1f(S.u.uDop, C.dop);
-  gl.uniform1f(S.u.uSpd, 1); gl.uniform1f(S.u.uFov, wide() ? .6 : 1.5);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-  gl.useProgram(Q.p);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
-  gl.uniform1i(Q.u.uTex, 0);
-  gl.uniform2f(Q.u.uRes, canvas.width, canvas.height);
-  gl.uniform1f(Q.u.uTime, (now / 1000) % 100);
-  gl.uniform1f(Q.u.uBloom, C.bloom);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-  telTimer += dt;
-}
-resize();
-requestAnimationFrame(t => { last = t; frame(t); });
-finishBoot();
-})();
-</script>
-</body>
-</html>
+<script type="module" src="./src/abyss/page.js"></script>
+<script type="module">import("./src/abyss/scene.js").catch(e=>{console.error(e);document.body.classList.add("no-gl");document.getElementById("boot").classList.add("done");});</script></body></html>
