@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<!--
+  ABYSS 원터치 설정 — intensity 숫자 하나 수정 → 저장 → 새로고침
+  0.5: 차분하게 / 1: 현재 기본 / 1.5: 활발하게 / 2: 강하게 (범위 0.25~3)
+  개체 수·유영·회피·선회·꼬리 박동·반응 범위·입자가 수식으로 함께 바뀝니다.
+  아래 상세 항목은 intensity=1일 때의 기준값입니다. 보통은 수정할 필요 없습니다.
+  population: 상어 수 / 깊이별 아귀 수 / 전방위 배치 방향 수 (bearings=4: 전후좌우)
+  motion: 속도·가속·선회·상하 운동 (값이 클수록 강함, Decay는 클수록 빨리 감속)
+  swim: 꼬리 박동 빈도·진폭 배율 / 활공 시 진폭 감소율(0~1)
+  interaction: 회피 반경(짧은 화면 변 길이 대비), 클릭 판정(ms), 시점 감도
+  lighting: 광량·빔 폭·거리 / scene: 안개·화질·수심·입자
+  각도는 라디안(0.36 ≈ 20.6°), 거리는 장면 단위, 속도는 초 기준입니다.
+  JSON 형식이므로 마지막 항목 뒤 쉼표나 블록 내부 주석은 넣지 마세요.
+-->
+<script id="abyss-config" type="application/json">
+{
+  "intensity": 1.6,
+  "population": {
+    "sharks": 56,
+    "anglers": 9,
+    "bearings": 4,
+    "canopy": true
+  },
+  "motion": {
+    "timeScale": 1,
+    "sharkCruiseSpeed": 2.1,
+    "sharkEscapeBoost": 15,
+    "sharkEscapeDuration": 4,
+    "sharkBurstDelay": 0.085,
+    "sharkBurstDecay": 1.35,
+    "sharkEscapeResponseDecay": 1.45,
+    "sharkTurnSpeed": 1.6,
+    "sharkEscapeTurnSpeed": 5.8,
+    "sharkVerticalMotion": 2.2,
+    "sharkVerticalWeave": 0.45,
+    "sharkPitchLimit": 0.36,
+    "sharkBankLimit": 0.32,
+    "anglerSwimSpeed": 1.6,
+    "anglerEscapeSpeed": 18,
+    "anglerEscapeDecay": 1.4
+  },
+  "swim": {
+    "frequencyMultiplier": 1,
+    "amplitudeMultiplier": 1,
+    "glideReduction": 0.88
+  },
+  "interaction": {
+    "scareRadius": 0.52,
+    "clickMaxMs": 360,
+    "dragThreshold": 8,
+    "lookSensitivity": 0.003,
+    "verticalMargin": 0.025,
+    "lampKey": "KeyF"
+  },
+  "lighting": {
+    "power": 0.85,
+    "beamWidth": 0.55,
+    "range": 62,
+    "aimDistance": 18,
+    "response": 5.5,
+    "aimResponse": 8,
+    "ambientDark": 0.1,
+    "ambientLit": 0.22,
+    "bloom": true
+  },
+  "scene": {
+    "fogDensity": 0.046,
+    "exposure": 1.18,
+    "pixelRatioLimit": 1.5,
+    "maxDepth": 80,
+    "snowCount": 1500,
+    "snowSize": 0.075,
+    "snowSpeed": 0.045,
+    "particleSpan": 60,
+    "particleHeight": 36
+  }
+}
+</script>
+<script>
+const ABYSS_CONFIG = JSON.parse(document.getElementById('abyss-config').textContent);
+// 모든 모듈과 스튜디오는 위의 동일한 설정 블록을 읽습니다.
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080c">
+<meta name="description" content="GoldHobbang — 심해. 손전등을 켜면 거대 어류가 빛 속을 지나갑니다.">
+<meta property="og:title" content="GoldHobbang — Code, made tangible.">
+<meta property="og:description" content="검색 인프라, 개발 도구, 브라우저 편집기, 한국어 분석 및 데이터 연구의 기록.">
+<meta property="og:type" content="website">
+<title>GoldHobbang — Abyss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08090a;--ink:#f4f3f0;--muted:#a6a9a8;--rule:rgba(244,243,240,.2);--orange:#ff683b;--paper:#e9e9e6;--dark:#191b1e;
+  --glass:rgba(10,11,12,.66);
+  --head:"Archivo Black","Arial Black",Arial,sans-serif;
+  --ko:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --pad:clamp(20px,5.2vw,88px);--hero-drift:0px;
+}
+*,*:before,*:after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--void)}
+body{margin:0;background:var(--void);color:var(--ink);font:400 15px/1.75 var(--ko);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+::selection{background:var(--orange);color:var(--void)}
+.skip{position:absolute;top:-70px;left:18px;padding:12px;background:var(--orange);color:#101010;z-index:200}
+.skip:focus{top:10px}
+.inner{max-width:1600px;padding-inline:var(--pad);margin-inline:auto}
+.meta{font:500 11px/1.65 var(--mono);letter-spacing:.03em}
+
+/* ---- background ---- */
+#gl{position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0}
+#fallback{position:fixed;inset:0;z-index:0;display:none;background:radial-gradient(circle at 50% 38%,#12343a 0%,#071018 46%,#05070a 72%),#05070a}
+.no-gl #fallback{display:block}.no-gl #gl{display:none}
+#boot{position:fixed;inset:0;z-index:300;background:var(--void);display:grid;place-items:center;transition:opacity 1.2s ease .15s,visibility 0s 1.5s}
+#boot.done{opacity:0;visibility:hidden}
+#boot div{display:flex;flex-direction:column;align-items:center;gap:22px;font:500 11px var(--mono);letter-spacing:.3em;color:var(--muted)}
+#boot b{font:400 26px var(--head);letter-spacing:-.08em;color:var(--ink)}#boot b i{font-style:normal;color:var(--orange)}
+#boot u{display:block;width:1px;height:48px;background:linear-gradient(var(--orange),transparent);animation:drip 1.4s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.page-progress{position:fixed;inset:0 0 auto;z-index:150;height:3px;pointer-events:none}
+.page-progress span{display:block;height:100%;transform:scaleX(0);transform-origin:0 50%;background:var(--orange)}
+
+/* ---- nav ---- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:82px;display:flex;align-items:center;gap:30px;justify-content:space-between;background:linear-gradient(rgba(8,9,10,.8),rgba(8,9,10,0));border-bottom:1px solid rgba(244,243,240,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);max-width:none}
+.logo{font:400 24px/1 var(--head);letter-spacing:-.08em;white-space:nowrap}.logo b{color:var(--orange);font-weight:inherit}
+.links{display:flex;align-items:center;gap:clamp(14px,2.6vw,40px);font:500 11px var(--mono)}
+.links a{position:relative;padding:6px 0;transition:color .2s}.links a:hover{color:var(--orange)}
+.links a[aria-current="location"]{color:var(--orange)}
+.links a[aria-current="location"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--orange);animation:navline .38s var(--ease) both;transform-origin:left}
+@keyframes navline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+main{position:relative;z-index:2}
+
+/* ---- hero ---- */
+.hero{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:clamp(120px,14vh,170px);padding-bottom:clamp(50px,7vw,90px)}
+.hero-cap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;color:var(--muted)}.hero-cap span:first-child{color:var(--orange)}
+.hero-title{font:400 clamp(63px,12.3vw,214px)/.98 var(--head);letter-spacing:-.095em;margin:clamp(30px,4.5vw,70px) 0 clamp(40px,6vw,100px);text-shadow:0 0 60px rgba(0,0,0,.55)}
+.hero-title>span{display:block}.hero-title .second{padding-left:clamp(28px,10vw,160px)}.hero-title .point{display:inline-block;color:var(--orange)}
+.hero-bottom{display:grid;grid-template-columns:1.15fr .8fr;gap:clamp(30px,7vw,140px);align-items:end}
+.hero-statement{font:600 clamp(22px,2.4vw,36px)/1.55 var(--ko);letter-spacing:-.055em;margin:0;word-break:keep-all;text-shadow:0 0 30px rgba(0,0,0,.7)}
+.hero-aside{border-left:1px solid var(--rule);padding-left:clamp(22px,3vw,46px)}
+.hero-aside p{color:#d3d6d4;font-size:14px;line-height:1.95;margin:0 0 28px;max-width:470px;word-break:keep-all;text-shadow:0 0 18px rgba(0,0,0,.8)}
+.inline-link{display:inline-block;border-bottom:1px solid currentColor;padding-bottom:5px;font:500 11px var(--mono);transition:transform .26s var(--ease),color .26s}
+.inline-link:hover{color:var(--orange);transform:translateY(-3px)}
+.signal{position:relative;overflow:hidden;background:var(--orange);color:#141618}
+.signal .inner{display:flex;justify-content:space-between;align-items:center;gap:30px;min-height:74px}
+.signal span{font:500 12px var(--mono)}.signal strong{font:400 clamp(16px,2vw,28px) var(--head);letter-spacing:-.03em}
+.signal::after{content:"";position:absolute;inset:0 auto 0 0;width:10%;background:#121416;opacity:.16;transform:translate3d(-130%,0,0) skewX(-28deg);pointer-events:none}
+.motion-on .signal.is-visible::after{animation:wipe 1.3s .12s var(--ease) 1 both}
+@keyframes wipe{to{transform:translate3d(1100%,0,0) skewX(-28deg)}}
+
+/* ---- section heads ---- */
+.section-top{position:relative;padding-block:clamp(74px,8vw,120px) 32px;border-bottom:1px solid rgba(244,243,240,.5)}
+.section-top h2{font:400 clamp(31px,5vw,68px)/1.1 var(--head);letter-spacing:-.064em;margin:9px 0 0;text-shadow:0 0 40px rgba(0,0,0,.6)}
+.section-top .meta{color:var(--muted)}
+.section-top::after{content:"";position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:var(--orange);transform:scaleX(0);transform-origin:left;opacity:0;transition:transform 1.15s var(--ease),opacity .5s}
+.motion-on .section-top.is-visible::after,html:not(.motion-on) .section-top::after{transform:scaleX(1);opacity:1}
+
+/* ---- stack ---- */
+.stack{padding-bottom:clamp(74px,10vw,150px)}
+.stack-intro{padding:26px 0 24px}.stack-intro p{margin:0;font:600 clamp(19px,2vw,26px)/1.6 var(--ko);max-width:690px;word-break:keep-all;text-shadow:0 0 24px rgba(0,0,0,.7)}
+.stack-list{border-top:2px solid var(--ink);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.stack-row{position:relative;display:grid;grid-template-columns:minmax(108px,.58fr) minmax(0,2.15fr) minmax(138px,.8fr);gap:clamp(18px,3vw,45px);padding:30px clamp(14px,2vw,28px) 34px;border-bottom:1px solid var(--rule);align-items:start}
+.stack-row::before{content:"";position:absolute;top:-1px;left:0;height:2px;width:100%;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.stack-row:hover::before,.stack-row:focus-within::before{transform:scaleX(1)}
+.stack-id{color:var(--orange);padding-top:7px}
+.stack-center h3{font:600 clamp(19px,2.35vw,31px)/1.48 var(--ko);letter-spacing:-.045em;margin:0;overflow-wrap:anywhere;transition:transform .4s var(--ease)}
+.stack-row:hover h3{transform:translateX(7px)}
+.stack-plus{color:var(--orange);font-weight:400;padding-inline:.13em}
+.stack-used{display:flex;flex-direction:column;gap:8px;padding-top:7px;align-items:flex-start}
+.stack-used a{color:#c7cbc8;border-bottom:1px solid transparent;overflow-wrap:anywhere;transition:color .2s,border-color .2s}.stack-used a:hover{color:var(--orange);border-color:var(--orange)}
+
+/* ---- work ---- */
+.work{padding-bottom:clamp(70px,9vw,136px)}
+.case{display:grid;grid-template-columns:clamp(48px,8vw,135px) minmax(0,1fr);gap:clamp(15px,3vw,40px);padding:clamp(40px,5vw,80px) clamp(14px,2vw,28px);border-bottom:1px solid var(--rule);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.case+.case{margin-top:-1px}
+.case-no{font:400 clamp(22px,3vw,44px)/1 var(--head);letter-spacing:-.06em;color:var(--orange)}
+.case-body{min-width:0}
+.case h3{font:400 clamp(48px,7.2vw,108px)/1 var(--head);letter-spacing:-.075em;margin:9px 0 34px;overflow-wrap:anywhere}
+.case-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,85px)}
+.case p{font-size:15px;line-height:1.9;color:#d0d4d2;max-width:510px;word-break:keep-all;margin:0 0 25px}
+.project-demo{display:inline-block;margin-left:24px}
+.machine{border-top:1px solid #9a9d9c;border-bottom:1px solid #9a9d9c;align-self:start}
+.machine-head{padding:13px 0 14px;color:#e2e5e4}
+.machine-step{display:grid;grid-template-columns:38px minmax(0,1fr) 24px;gap:16px;padding:13px 0;border-top:1px solid var(--rule);font:500 13px/1.5 var(--mono)}
+.machine-step span{color:var(--orange)}.machine-step b{font-weight:500}.machine-step i{font-style:normal;color:#959a98;transition:color .45s}
+.diff{align-self:start;border:1px solid #777e7d}
+.diff-title{padding:13px 17px;border-bottom:1px solid #777e7d}
+.diff-row{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:15px 14px;font:400 12px/1.6 var(--mono);border-bottom:1px solid var(--rule)}
+.diff-row:last-child{border:0}.diff-row span{color:var(--muted)}.diff-row code{overflow-wrap:anywhere;white-space:pre-wrap}.diff-row.good{color:#bfe6bd}
+/* inverted case */
+.case-alt{background:var(--paper);color:var(--dark);backdrop-filter:none;-webkit-backdrop-filter:none;border-color:#c9c9c4}
+.case-alt p{color:#3e4444}.case-alt .case-no{color:var(--dark)}.case-alt .inline-link:hover{color:#da431f}
+.routing{align-self:start;border:1px solid #27292b;padding:22px 21px 21px}
+.routing-label{display:block;margin-bottom:18px}
+.routing-query{background:#1b1d1e;color:#fbfaf5;font:500 13px/1.75 var(--mono);padding:18px;overflow-wrap:anywhere}
+.routing-line{border-left:1px solid #303232;height:34px;margin-left:20px;transform-origin:top}
+.routing-result{display:flex;justify-content:space-between;gap:10px;border:1px solid #333;padding:12px 14px;font:500 12px var(--mono)}
+.routing-tags{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:4px}
+.routing-tags span{background:#d0d0cc;font:400 10px/1.45 var(--mono);text-align:center;padding:10px 3px;overflow-wrap:anywhere}
+
+/* ---- playground / simulator ---- */
+.playground{min-height:190vh;padding-bottom:12vh}
+.pg-col{position:sticky;top:96px;width:min(420px,100%);max-height:calc(100vh - 112px);max-height:calc(100svh - 112px);overflow-y:auto;scrollbar-width:none;padding-top:34px}
+.pg-col::-webkit-scrollbar{display:none}
+.pg-intro{margin-bottom:22px;text-shadow:0 0 22px rgba(0,0,0,.85)}
+.pg-intro p{margin:0;font-size:14px;line-height:1.85;color:#e0e3e1;word-break:keep-all}
+.pg-intro p+p{margin-top:10px;color:var(--muted);font-size:13px}
+/* ---- index ---- */
+.archive{padding-bottom:clamp(110px,12vw,190px)}
+.archive-list{list-style:none;margin:0;padding:0;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.archive-list li{position:relative;border-bottom:1px solid var(--rule)}
+.archive-list li::after{content:"";position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:var(--orange);transform-origin:left;transform:scaleX(0);transition:transform .65s var(--ease);pointer-events:none}
+.archive-list li:hover::after,.archive-list li:focus-within::after{transform:scaleX(1)}
+.archive-list a{display:grid;grid-template-columns:minmax(0,1fr) 100px;gap:20px;padding:25px clamp(14px,2vw,28px);align-items:start;transition:background .2s}
+.archive-list a:hover{background:rgba(244,243,240,.05)}
+.archive-name strong{font:400 clamp(20px,2.4vw,33px)/1.25 var(--head);letter-spacing:-.055em;overflow-wrap:anywhere;display:block;transition:transform .4s var(--ease),color .35s}
+.archive-name small{font:400 12px/1.8 var(--ko);color:#b4b9b6;display:block;margin-top:5px;word-break:keep-all;max-width:800px}
+.archive-access{font:400 11px/1.6 var(--mono);color:var(--muted);text-align:right}.archive-access .up{display:inline-block;color:var(--orange);transition:transform .26s var(--ease)}
+.archive-list li:hover strong,.archive-list li:focus-within strong{transform:translateX(8px);color:var(--orange)}
+.archive-list li:hover .up{transform:translate(4px,-4px)}
+
+/* ---- about / footer ---- */
+.about{background:var(--orange);color:var(--dark);padding-block:clamp(80px,10vw,150px)}
+.about-grid{max-width:920px;margin-inline:0}
+.about h2{font:400 clamp(37px,5.3vw,72px)/1.22 var(--head);letter-spacing:-.07em;margin:0 0 35px;overflow-wrap:anywhere}
+.about p{font:500 15px/1.95 var(--ko);max-width:610px;margin:0 0 30px;word-break:keep-all}
+.about .inline-link:hover{color:#fff}
+.footer{position:relative;z-index:2;background:var(--void);padding-block:44px 48px;display:flex;justify-content:space-between;gap:20px;align-items:center;color:var(--muted);max-width:none}
+.footer a:hover{color:var(--orange)}
+
+/* ---- motion ---- */
+.motion-on .nav .logo{animation:enter .75s var(--ease) both}.motion-on .nav .links{animation:enter .8s .13s var(--ease) both}
+.motion-on .hero-cap{animation:enter .75s .6s var(--ease) both}
+.motion-on .hero-title>span{animation:arrive 1.05s var(--ease) both;transform-origin:left bottom}
+.motion-on .hero-title>span:first-child{animation-delay:.8s}.motion-on .hero-title>span.second{animation-delay:1s}
+.motion-on .hero-title .point{animation:pop .7s 1.7s var(--ease) both}
+.motion-on .hero-statement{animation:enter .9s 1.25s var(--ease) both}.motion-on .hero-aside{animation:enter 1s 1.4s var(--ease) both}
+@keyframes enter{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:none}}
+@keyframes arrive{0%{opacity:0;transform:translate3d(0,70px,0) skewY(2deg);filter:blur(5px)}75%{filter:blur(0)}100%{opacity:1;transform:none;filter:blur(0)}}
+@keyframes pop{0%{opacity:0;transform:translate3d(0,28px,0) scale(.4)}72%{opacity:1;transform:translate3d(0,-6px,0) scale(1.09)}100%{opacity:1;transform:none}}
+@media(min-width:661px){.motion-on .hero-title{transform:translate3d(0,calc(-1*var(--hero-drift)),0)}}
+.motion-on .reveal{opacity:0;transform:translate3d(0,34px,0);transition:opacity .85s var(--ease),transform .9s var(--ease);transition-delay:var(--d,0ms)}
+.motion-on .reveal.is-visible{opacity:1;transform:none}
+.motion-on .case .case-inner>div:first-child,.motion-on .case h3{opacity:0;transform:translate3d(0,25px,0);transition:opacity .75s var(--ease),transform .8s var(--ease)}
+.motion-on .case.is-visible h3,.motion-on .case.is-visible .case-inner>div:first-child{opacity:1;transform:none}
+.motion-on .case.is-visible h3{transition-delay:.18s}.motion-on .case.is-visible .case-inner>div:first-child{transition-delay:.32s}
+.motion-on .case .machine,.motion-on .case .routing,.motion-on .case .diff{opacity:0;transform:translate3d(28px,0,0);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.motion-on .case.is-visible .machine,.motion-on .case.is-visible .routing,.motion-on .case.is-visible .diff{opacity:1;transform:none;transition-delay:.4s}
+.motion-on .machine-step,.motion-on .diff-row{opacity:0;transform:translate3d(-18px,0,0);transition:opacity .62s var(--ease),transform .66s var(--ease);transition-delay:calc(.6s + var(--s,0)*.17s)}
+.motion-on .case.is-visible .machine-step,.motion-on .case.is-visible .diff-row{opacity:1;transform:none}
+.motion-on .case.is-visible .machine-step i{color:var(--orange)}
+.machine-step:nth-of-type(2),.diff-row:nth-of-type(2){--s:0}.machine-step:nth-of-type(3),.diff-row:nth-of-type(3){--s:1}.machine-step:nth-of-type(4),.diff-row:nth-of-type(4){--s:2}.machine-step:nth-of-type(5),.diff-row:nth-of-type(5){--s:3}
+.motion-on .routing-query{opacity:0;transform:translateY(14px);transition:opacity .65s var(--ease),transform .65s var(--ease);transition-delay:.62s}
+.motion-on .routing-line{transform:scaleY(0);transition:transform .5s var(--ease) .93s}
+.motion-on .routing-result{opacity:0;transform:translateY(9px);transition:opacity .5s var(--ease) 1.23s,transform .5s var(--ease) 1.23s}
+.motion-on .routing-tags span{opacity:0;transform:translateY(12px);transition:opacity .48s var(--ease),transform .48s var(--ease);transition-delay:calc(1.5s + var(--s,0)*.13s)}
+.routing-tags span:nth-child(2){--s:1}.routing-tags span:nth-child(3){--s:2}
+.motion-on .case.is-visible .routing-query,.motion-on .case.is-visible .routing-result,.motion-on .case.is-visible .routing-tags span{opacity:1;transform:none}
+.motion-on .case.is-visible .routing-line{transform:scaleY(1)}
+.motion-on .about h2{transform-origin:left}.motion-on .about.is-visible h2{animation:about .95s .13s var(--ease) both}
+@keyframes about{from{letter-spacing:-.12em;opacity:.45;transform:translateX(-18px)}to{letter-spacing:-.07em;opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.motion-on *,.motion-on *::before,.motion-on *::after{animation:none!important;transition:none!important}.motion-on .reveal,.motion-on .case *{opacity:1!important;transform:none!important}#boot u{animation:none}}
+
+/* ---- responsive ---- */
+@media(max-width:950px){.case-inner{grid-template-columns:1fr}.case p{max-width:650px}.machine,.routing,.diff{max-width:640px}.hero-title{font-size:clamp(58px,12.6vw,112px)}}
+@media(max-width:900px){.pg-col{position:static;max-height:none;margin-inline:auto}.playground{display:flex;flex-direction:column;justify-content:flex-end;min-height:170vh}}
+@media(max-width:660px){
+  .nav{height:68px}.logo{font-size:19px}.links{gap:14px;font-size:10px}.links a:nth-child(n+2):not(:nth-child(3)):not(:last-child){display:none}
+  .hero-title{font-size:clamp(46px,13vw,80px)}.hero-title .second{padding-left:7vw}
+  .hero-bottom{grid-template-columns:1fr;gap:28px}.hero-aside{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:24px}
+  .signal .inner{min-height:64px}.signal strong{font-size:15px}
+  .stack-row{grid-template-columns:1fr;gap:12px;padding-block:24px}.stack-id{padding:0}.stack-used{flex-direction:row;flex-wrap:wrap;gap:8px 18px;padding-top:0}
+  .case{grid-template-columns:1fr;gap:12px}.case-no{font-size:26px}.case h3{font-size:clamp(43px,11vw,70px)}
+  .project-demo{display:block;margin:17px 0 0}
+  .archive-list a{grid-template-columns:minmax(0,1fr) 75px;gap:12px}
+  .footer{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<canvas id="gl" role="img" aria-label="어두운 심해. 손전등을 켜면 빛 속에서 거대 물고기가 지나갑니다."></canvas>
+<div id="fallback"></div>
+<div id="boot"><div><b>GH<i>/</i></b><u></u>ABYSS</div></div>
+<div class="page-progress" aria-hidden="true"><span></span></div>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="nav inner"><a class="logo" href="#top" aria-label="GoldHobbang 홈">GH<b>/</b></a>
+<nav class="links" aria-label="사이트 메뉴"><a href="#stack">STACK</a><a href="#selected">WORK</a><a href="#playground">PLAYGROUND</a><a href="#archive">INDEX</a><a href="#about">ABOUT</a><a href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></nav></header>
+
+<main id="main">
+<section class="hero inner" id="top" aria-labelledby="hero-heading">
+  <div class="hero-cap meta"><span>PORTFOLIO</span><span>PROJECT INDEX</span></div>
+  <h1 class="hero-title" id="hero-heading"><span>GOLD</span><span class="second">HOBBANG<span class="point">.</span></span></h1>
+  <div class="hero-bottom">
+    <p class="hero-statement">직접 쓰고 싶은 도구를 만들고,<br>작동하는 이유까지 확인합니다.</p>
+    <div class="hero-aside"><p>Python과 TypeScript를 중심으로 개발 도구, 데이터 시스템, 웹·데스크톱 앱을 만드는 학생 개발자입니다. 사용한 기술은 실제 저장소와 연결해 두었습니다.</p><a class="inline-link" href="#selected">SELECTED WORK ↓</a></div>
+  </div>
+</section>
+<div class="signal reveal-signal"><div class="inner"><strong>12 PROJECTS.</strong><span>5 PUBLIC · 7 PRIVATE</span></div></div>
+
+<section class="stack inner" id="stack" aria-labelledby="stack-heading">
+  <div class="section-top"><h2 id="stack-heading">THE TOOLKIT.</h2></div>
+  <div class="stack-intro"><p>실제 프로젝트에서 사용한 기술을 정리했습니다.</p></div>
+  <div class="stack-list">
+    <div class="stack-row"><div class="stack-id meta">LANGUAGES</div><div class="stack-center"><h3>Python <span class="stack-plus">/</span> TypeScript <span class="stack-plus">/</span> JavaScript</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer">Delint ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">APPLICATIONS</div><div class="stack-center"><h3>React <span class="stack-plus">/</span> Next.js <span class="stack-plus">/</span> Tauri <span class="stack-plus">/</span> Expo</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">PocVault ↗</a><a href="https://github.com/Goldhobbang/TodoGround" target="_blank" rel="noopener noreferrer">TodoGround ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">DATA</div><div class="stack-center"><h3>SQLite FTS5 <span class="stack-plus">/</span> Prisma <span class="stack-plus">/</span> MCP</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Hobbang-BRAIN" target="_blank" rel="noopener noreferrer">Hobbang-BRAIN ↗</a><a href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">PocVault ↗</a><a href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">omniSearch ↗</a></div></div>
+    <div class="stack-row"><div class="stack-id meta">ENGINEERING</div><div class="stack-center"><h3>AST <span class="stack-plus">/</span> CLI <span class="stack-plus">/</span> Vitest <span class="stack-plus">/</span> GitHub Actions</h3></div><div class="stack-used meta"><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer">Delint ↗</a><a href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">omniSearch ↗</a></div></div>
+  </div>
+</section>
+
+<section class="work inner" id="selected" aria-labelledby="selected-heading">
+  <div class="section-top"><h2 id="selected-heading">SELECTED.</h2></div>
+  <article class="case" id="case-1" aria-labelledby="todoground-title"><div class="case-no">01</div><div class="case-body"><h3 id="todoground-title">TodoGround</h3><div class="case-inner"><div><p>Windows 바탕화면에서 할 일과 메모를 바로 확인하도록 설계한 생산성 도구입니다. React 캔버스 편집기의 레이아웃을 Rust·resvg 렌더링 파이프라인과 연결해 정적 배경화면으로 출력합니다. 실시간 상호작용 모드는 실제 기기 검증이 더 필요합니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/TodoGround" target="_blank" rel="noopener noreferrer">GITHUB · PRIVATE ↗</a></div>
+    <div class="machine" aria-label="TodoGround 렌더링 구조 예시"><div class="machine-head meta"><span>배경화면 렌더링 흐름</span></div><div class="machine-step"><span>01</span><b>Canvas editor &amp; widgets</b><i>↘</i></div><div class="machine-step"><span>02</span><b>Shared layout data</b><i>↘</i></div><div class="machine-step"><span>03</span><b>Rust + resvg → PNG wallpaper</b><i>✓</i></div><div class="machine-step"><span>04</span><b>Lively interactive mode</b><i>↗</i></div></div></div></div></article>
+  <article class="case case-alt" id="case-2" aria-labelledby="pocvault-title"><div class="case-no">02</div><div class="case-body"><h3 id="pocvault-title">PocVault</h3><div class="case-inner"><div><p>흩어진 메모와 링크를 한곳에서 관리하는 개인용 웹 보관함입니다. Next.js·NextAuth 기반 Google OAuth 인증, Prisma 데이터 모델, 메모·북마크 CRUD와 태그 검색을 구현했습니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/PocVault" target="_blank" rel="noopener noreferrer">GITHUB · PRIVATE ↗</a></div>
+    <div class="routing" aria-label="PocVault 인증과 데이터 흐름 도식"><span class="routing-label meta">인증 · 저장</span><div class="routing-query">Google OAuth → authenticated session</div><div class="routing-line" aria-hidden="true"></div><div class="routing-result"><strong>Next.js API</strong><span>↔</span><span>Prisma</span></div><div class="routing-tags"><span>Notes</span><span>Links</span><span>Tags / Search</span></div></div></div></div></article>
+  <article class="case" id="case-3" aria-labelledby="omni-title"><div class="case-no">03</div><div class="case-body"><h3 id="omni-title">omniSearch</h3><div class="case-inner"><div><p>API 키 없이 사용할 수 있는 검색 소스를 질의 유형에 따라 선택하는 검색 라우터입니다. 규칙 기반 분류·점수화·폴백 및 결과 융합을 구현했으며 Python 라이브러리, CLI, MCP 서버, 웹 UI로 제공합니다. 브라우저 데모는 CORS 허용 엔진으로 제한됩니다.</p><a class="inline-link" href="https://github.com/Goldhobbang/omniSearch" target="_blank" rel="noopener noreferrer">GITHUB ↗</a><span class="project-demo"><a class="inline-link" href="https://goldhobbang.github.io/omniSearch/" target="_blank" rel="noopener noreferrer">DEMO ↗</a></span></div>
+    <div class="diff" aria-label="omniSearch 검색 라우팅 개념 예시"><div class="diff-title meta"><span>검색 처리 흐름</span></div><div class="diff-row"><span>01</span><code>query: Attention Is All You Need</code></div><div class="diff-row good"><span>02</span><code>classify → scholarly query</code></div><div class="diff-row"><span>03</span><code>OpenAlex / Crossref / arXiv</code></div><div class="diff-row"><span>04</span><code>score → select / fuse results</code></div></div></div></div></article>
+</section>
+
+<section class="playground inner" id="playground" aria-labelledby="pg-heading">
+  <div class="section-top"><h2 id="pg-heading">PLAYGROUND.</h2></div>
+  <div class="pg-col">
+    <div class="pg-intro">
+      <p>어둠 속에서 심해아귀가 부유하고, 긴 몸의 생물이 물결치며 지나갑니다. 손전등으로 가까운 생물의 모습을 살펴보세요.</p>
+      <p>빈 배경을 짧게 누르면 주변 물고기가 놀라 도망갑니다. <span data-lamp-key>F</span> 키를 누르는 동안 손전등이 켜지고, 커서 방향을 비춥니다. 마우스나 터치 드래그로 위·아래와 뒤쪽까지 360° 둘러보세요. 어둠 속에서도 아귀의 미끼는 빛납니다.</p>
+    </div>
+
+  </div>
+</section>
+
+
+
+<section class="archive inner" id="archive" aria-labelledby="archive-heading">
+  <div class="section-top"><h2 id="archive-heading">THE INDEX.</h2></div>
+  <ol class="archive-list">
+    <li><a href="https://github.com/Goldhobbang/Delint" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>Delint</strong><small>TypeScript 기반 디자인 토큰 정적 분석기. AST·규칙 엔진·보수적 자동 수정</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/Hobbang-BRAIN" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>Hobbang-BRAIN</strong><small>개인 데이터 정규화, 원본 출처 보존, SQLite FTS 기반 지식 검색</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/DiagramPreview" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>DiagramPreview</strong><small>HTML 프레젠테이션 템플릿과 다이어그램 라이브러리·Figma 조합 빌더</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/FoodRoulette" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>FoodRoulette</strong><small>룰렛과 자연어 필터를 결합한 React Native 음식 선택 앱</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/pyasynckit" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>pyasynckit</strong><small>asyncio 재시도와 백오프를 위한 경량 Python 라이브러리 (초기 개발)</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/AutismResearch" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>AutismResearch</strong><small>웨어러블 생체신호 기반 조기 위험 알림 연구. WESAD 성인 스트레스 분류와 LOSO 검증, ESP32-S3 제품 설계를 수행했으며 아동 멜트다운 조기예측 성능은 아직 검증하지 않음</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/PDFNative" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>PDFNative</strong><small>PDF.js·PDFium WASM 기반 브라우저 내 PDF 텍스트·이미지 편집기. 로컬 처리, 원본 보존, 검증 가능한 편집을 지향하며 지원하지 않는 PDF 구조는 편집을 제한</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/PoomSa" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>PoomSa</strong><small>한국어 품사·형태소·문장 성분 학습 웹앱. 브라우저 WASM 형태소 분석과 규칙 기반 해설을 결합하며 자유 문장 채점은 잠정 정답으로 제공</small></span><span class="archive-access">PUBLIC <span class="up">↗</span></span></a></li>
+    <li><a href="https://github.com/Goldhobbang/HnolMokhwa" target="_blank" rel="noopener noreferrer"><span class="archive-name"><strong>HnolMokhwa</strong><small>Three.js 기반 3D 스텔스 웹게임. 시야 회피·은신·카메라 전환과 모바일 조작을 구현한 인터랙티브 게임 프로젝트</small></span><span class="archive-access">PRIVATE <span class="up">↗</span></span></a></li>
+  </ol>
+</section>
+
+<section class="about" id="about" aria-labelledby="about-heading"><div class="inner about-grid"><div><h2 id="about-heading">Build it.<br>Then verify.</h2><p>컴퓨터공학과 데이터과학을 공부하는 학생 개발자 GoldHobbang입니다. TodoGround, PocVault, omniSearch뿐 아니라 PDFNative, PoomSa, AutismResearch 등 개발 도구와 데이터 연구를 직접 설계하고 구현합니다. 만들었다는 사실보다 어떻게 설계했고 무엇을 검증했는지를 중요하게 생각합니다.</p><a class="inline-link" href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></div></div></section>
+</main>
+<footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="#top">BACK TO TOP ↑</a></footer>
+
+
+
+<script type="module" src="./src/abyss/page.js"></script>
+<script type="module">import("./src/abyss/scene.js").catch(e=>{console.error(e);document.body.classList.add("no-gl");document.getElementById("boot").classList.add("done");});</script></body></html>
