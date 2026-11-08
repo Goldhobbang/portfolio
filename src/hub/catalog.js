@@ -5,6 +5,8 @@
 export const OWNER = "Goldhobbang";
 export const REPOS_URL = `https://api.github.com/users/${OWNER}/repos?per_page=100`;
 export const SELF_REPOS = new Set(["portfolio"]);
+// 소유자가 허브 목록에서 빼 둔 저장소. 공개 Pages여도 카드로 올리지 않습니다.
+export const HIDDEN_REPOS = new Set(["yougay"]);
 
 const GITHUB_MISS = "There isn't a GitHub Pages site here.";
 
@@ -100,7 +102,15 @@ export function normalizeUrl(value) {
 }
 
 export function isSelfRepo(name) {
-  return SELF_REPOS.has(String(name || "").trim().toLowerCase());
+  return SELF_REPOS.has(repoKey(name));
+}
+
+export function isHiddenRepo(name) {
+  return HIDDEN_REPOS.has(repoKey(name));
+}
+
+function repoKey(name) {
+  return String(name || "").trim().toLowerCase();
 }
 
 export function isSelfUrl(value, here = {}) {
@@ -146,7 +156,7 @@ export function mergeCandidates(repos, manifestSites, here) {
   const seen = new Set();
   const add = (entry) => {
     if (!entry?.name || !entry.url) return;
-    if (isSelfRepo(entry.name) || isSelfUrl(entry.url, here)) return;
+    if (isSelfRepo(entry.name) || isHiddenRepo(entry.name) || isSelfUrl(entry.url, here)) return;
     let key;
     try {
       key = normalizeUrl(entry.url);

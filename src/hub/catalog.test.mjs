@@ -15,6 +15,7 @@ import {
   cleanDescription,
   displayBlurb,
   htmlTitle,
+  isHiddenRepo,
   isSelfRepo,
   isSelfUrl,
   looksLikeGithubPagesMiss,
@@ -49,6 +50,9 @@ test("this portfolio is excluded by repo name and by its public URLs", () => {
   assert.equal(isSelfRepo("portfolio"), true);
   assert.equal(isSelfRepo("Portfolio"), true);
   assert.equal(isSelfRepo("omniSearch"), false);
+  assert.equal(isHiddenRepo("yougay"), true);
+  assert.equal(isHiddenRepo("YouGay"), true);
+  assert.equal(isHiddenRepo("omniSearch"), false);
   assert.equal(isSelfUrl("https://goldhobbang.dev/"), true);
   assert.equal(isSelfUrl("https://goldhobbang.dev/hub.html"), true);
   assert.equal(isSelfUrl("https://goldhobbang.github.io/portfolio"), true);
@@ -82,12 +86,14 @@ test("manifest entries merge without duplicating or replacing the live API resul
       default_branch: "main",
     },
     { name: "portfolio", has_pages: true, homepage: null, description: "self" },
+    { name: "yougay", has_pages: true, homepage: null, description: "hidden" },
     { name: "pyasynckit", has_pages: false, homepage: null },
   ];
   const manifest = [
     { name: "omniSearch", url: "https://goldhobbang.github.io/omniSearch/", description: "duplicate" },
     { name: "playground", url: "https://goldhobbang.github.io/playground/", description: "연습" },
     { name: "portfolio", url: "https://goldhobbang.dev/" },
+    { name: "yougay", url: "https://goldhobbang.github.io/yougay/" },
   ];
   const sites = mergeCandidates(repos, manifest);
   assert.deepEqual(sites.map((site) => site.name), ["omniSearch", "playground"]);

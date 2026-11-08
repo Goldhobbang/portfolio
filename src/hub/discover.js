@@ -14,7 +14,7 @@ import {
   slimRepo,
 } from "./catalog.js";
 
-const CACHE_KEY = "goldhobbang-transit-v1";
+const CACHE_KEY = "goldhobbang-transit-v2";
 const FRESH_MS = 10 * 60 * 1000;
 const API_HEADERS = {
   Accept: "application/vnd.github+json",
