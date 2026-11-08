@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090a">
+<meta name="description" content="GoldHobbang Transit — 공개 GitHub Pages 가운데 실제로 열리는 사이트를 미리보고 이동합니다.">
+<meta property="og:title" content="GoldHobbang — Transit">
+<meta property="og:description" content="코드 저장소가 아니라, 지금 열리는 페이지만 모은 통로.">
+<meta property="og:type" content="website">
+<title>GoldHobbang — Transit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Gothic+A1:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#08090a;--ink:#f4f3f0;--muted:#a6a9a8;--rule:rgba(244,243,240,.2);--orange:#ff683b;--paper:#e9e9e6;--dark:#191b1e;
+  --glass:rgba(10,11,12,.66);
+  --head:"Archivo Black","Arial Black",Arial,sans-serif;
+  --ko:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",Consolas,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --pad:clamp(20px,5.2vw,88px);
+}
+*,*:before,*:after{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--void)}
+body{
+  margin:0;color:var(--ink);font:400 15px/1.75 var(--ko);-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background:
+    radial-gradient(circle at 78% 8%, rgba(255,104,59,.16), transparent 26%),
+    radial-gradient(circle at 12% 88%, rgba(18,52,58,.9), transparent 42%),
+    var(--void);
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+::selection{background:var(--orange);color:var(--void)}
+.skip{position:absolute;top:-70px;left:18px;padding:12px;background:var(--orange);color:#101010;z-index:200}
+.skip:focus{top:10px}
+.inner{max-width:1600px;padding-inline:var(--pad);margin-inline:auto}
+.meta{font:500 11px/1.65 var(--mono);letter-spacing:.03em}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:82px;display:flex;align-items:center;gap:30px;justify-content:space-between;background:linear-gradient(rgba(8,9,10,.86),rgba(8,9,10,0));border-bottom:1px solid rgba(244,243,240,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);max-width:none}
+.logo{font:400 24px/1 var(--head);letter-spacing:-.08em;white-space:nowrap}.logo b{color:var(--orange);font-weight:inherit}
+.links{display:flex;align-items:center;gap:clamp(14px,2.6vw,40px);font:500 11px var(--mono)}
+.links a{position:relative;padding:6px 0;transition:color .2s}.links a:hover{color:var(--orange)}
+.links a[aria-current="page"]{color:var(--orange)}
+.links a[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--orange)}
+main{position:relative;z-index:2}
+.hero{padding-top:clamp(118px,16vh,168px);padding-bottom:clamp(18px,3vw,36px)}
+.hero-cap{display:flex;justify-content:space-between;gap:20px;align-items:center;color:var(--muted)}
+.hero-cap span:first-child{color:var(--orange)}
+.hero-tools{display:flex;align-items:center;gap:18px}
+.text-btn{font:500 11px var(--mono);letter-spacing:.03em;padding:6px 0}
+.text-btn:hover{color:var(--orange)}
+.text-btn:disabled{opacity:.4;cursor:progress}
+.hero-title{font:400 clamp(62px,11.4vw,188px)/.92 var(--head);letter-spacing:-.09em;margin:clamp(18px,3vw,36px) 0 clamp(18px,3vw,28px)}
+.hero-title>span{display:block}.hero-title .second{padding-left:clamp(28px,10vw,160px)}.hero-title .point{color:var(--orange)}
+.hero-bottom{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(240px,.7fr);gap:clamp(24px,6vw,100px);align-items:end}
+.hero-statement{font:700 clamp(22px,2.3vw,34px)/1.5 var(--ko);letter-spacing:-.05em;margin:0;word-break:keep-all}
+.hero-note{margin:0;color:#d3d6d4;font-size:14px;line-height:1.9;word-break:keep-all}
+.inline-link{display:inline-block;border-bottom:1px solid currentColor;padding-bottom:4px;font:500 11px var(--mono);transition:color .2s,transform .26s var(--ease)}
+.inline-link:hover{color:var(--orange);transform:translateY(-2px)}
+.hub-status{margin:clamp(28px,4vw,48px) 0 18px;color:#c5c9c7;min-height:1.7em}
+.hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px;padding-bottom:clamp(90px,12vw,160px)}
+.site-card{position:relative;min-width:0;padding:22px 20px 16px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--rule)}
+.site-card::before{content:"";position:absolute;top:0;left:0;height:2px;width:100%;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.site-card:hover::before,.site-card:focus-within::before{transform:scaleX(1)}
+.site-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px 16px;align-items:start;margin-bottom:14px}
+.site-no{font:400 clamp(22px,2vw,34px)/1 var(--head);letter-spacing:-.06em;color:var(--orange);padding-top:6px}
+.site-titles h2{margin:0;font:400 clamp(28px,3vw,46px)/.98 var(--head);letter-spacing:-.06em;overflow-wrap:anywhere}
+.site-titles p{margin:8px 0 0;color:#c9cdcb;font-size:14px;line-height:1.7;word-break:keep-all}
+.site-lang{color:var(--muted);padding-top:8px}
+.viewport{position:relative;aspect-ratio:16/10;overflow:hidden;background:#05070a;border-top:1px solid rgba(244,243,240,.28);border-bottom:1px solid rgba(244,243,240,.28)}
+.viewport iframe{position:absolute;top:0;left:0;width:1440px;height:900px;border:0;background:#f4f3f0;transform-origin:top left;transform:scale(var(--fit,.28))}
+.viewport.is-blocked iframe{visibility:hidden}
+.viewport.is-loading::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 18%,rgba(255,104,59,.18),transparent 82%);transform:translateX(-70%);animation:sweep 1.5s var(--ease) infinite;pointer-events:none}
+@keyframes sweep{to{transform:translateX(70%)}}
+.viewport-fallback{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;padding:clamp(18px,3vw,32px);background:radial-gradient(circle at 18% 0,rgba(255,104,59,.2),transparent 34%),linear-gradient(180deg,rgba(8,9,10,.2),#101214 70%);color:var(--ink)}
+.viewport-fallback[hidden]{display:none}
+.viewport-fallback .meta{color:var(--orange)}
+.viewport-fallback strong{font:400 clamp(26px,3vw,42px)/1.05 var(--head);letter-spacing:-.05em}
+.viewport-fallback p{margin:0;max-width:36ch;color:#d0d4d2;font-size:14px;word-break:keep-all}
+.site-foot{display:flex;align-items:center;gap:16px;min-height:48px}
+.site-url{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c7cbc8;font:500 12px/1.4 var(--mono)}
+.site-repo{margin-left:auto;font:500 11px var(--mono);color:var(--muted)}
+.site-url:hover,.site-repo:hover{color:var(--orange)}
+.hub-note{grid-column:1 / -1;padding:clamp(28px,4vw,48px) 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--glass)}
+.hub-note strong{display:block;font:400 clamp(32px,4.4vw,60px)/1.05 var(--head);letter-spacing:-.055em;margin-bottom:10px}
+.hub-note p{margin:0;max-width:62ch;color:#d0d4d2;word-break:keep-all}
+.is-skeleton .site-titles h2,.is-skeleton .site-titles p{background:rgba(244,243,240,.08);color:transparent;border-radius:2px}
+.is-skeleton h2{height:34px;width:min(240px,70%)}
+.is-skeleton p{height:14px;width:min(360px,86%);margin-top:12px}
+.footer{position:relative;z-index:2;padding-block:44px 48px;display:flex;justify-content:space-between;gap:20px;align-items:center;color:var(--muted);max-width:none}
+.footer a:hover{color:var(--orange)}
+.motion-on .hero-title>span{animation:arrive 1s var(--ease) both}
+.motion-on .hero-title>span.second{animation-delay:.12s}
+.motion-on .site-card{animation:enter .8s var(--ease) both;animation-delay:var(--d,0ms)}
+@keyframes enter{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:none}}
+@keyframes arrive{from{opacity:0;transform:translate3d(0,48px,0)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.viewport.is-loading::after{animation:none}}
+@media(max-width:980px){.hub-grid{grid-template-columns:1fr}.hero-bottom{grid-template-columns:1fr;gap:18px}}
+@media(max-width:660px){
+  .nav{height:68px}.logo{font-size:19px}.links{gap:14px;font-size:10px}
+  .links a:nth-child(n+2):not(:nth-child(3)):not(:last-child):not(.nav-hub){display:none}
+  .hero-title{font-size:clamp(48px,14vw,78px)}.hero-title .second{padding-left:7vw}
+  .site-head{grid-template-columns:auto minmax(0,1fr)}.site-lang{grid-column:2}
+  .site-foot{flex-wrap:wrap}.site-repo{margin-left:0}
+  .footer{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+<header class="nav inner">
+  <a class="logo" href="index.html" aria-label="GoldHobbang 홈">GH<b>/</b></a>
+  <nav class="links" aria-label="사이트 메뉴">
+    <a href="index.html#stack">STACK</a>
+    <a href="index.html#selected">WORK</a>
+    <a href="index.html#playground">PLAYGROUND</a>
+    <a href="index.html#archive">INDEX</a>
+    <a href="index.html#about">ABOUT</a>
+    <a class="nav-hub" href="hub.html" aria-current="page">HUB</a>
+    <a href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
+  </nav>
+</header>
+<main id="main">
+  <section class="hero inner" aria-labelledby="hub-heading">
+    <div class="hero-cap meta">
+      <span>TRANSIT</span>
+      <span class="hero-tools"><span id="hub-count">SCAN</span><button type="button" class="text-btn" id="hub-refresh">RESCAN</button></span>
+    </div>
+    <h1 class="hero-title" id="hub-heading"><span>OTHER</span><span class="second">SURFACES<span class="point">.</span></span></h1>
+    <div class="hero-bottom">
+      <p class="hero-statement">코드 목록이 아니라,<br>지금 열리는 페이지만 둡니다.</p>
+      <p class="hero-note">공개 저장소를 브라우저에서 확인한 뒤, GitHub Pages 주소가 실제로 응답하는 사이트만 미리보기로 띄웁니다. 이 포트폴리오 자신은 빼 두었습니다.</p>
+    </div>
+    <p class="hub-status meta" id="hub-status" role="status">공개 저장소를 확인하는 중</p>
+  </section>
+  <div class="inner">
+    <div class="hub-grid" id="hub-grid" aria-live="polite" aria-busy="true"></div>
+  </div>
+</main>
+<footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="index.html">ABYSS ↑</a></footer>
+<script type="module" src="./src/hub/discover.js"></script>
+</body>
+</html>

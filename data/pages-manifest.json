@@ -1,0 +1,4 @@
+{
+  "_comment": "공개 API로 보이지 않는 Pages(비공개 저장소 등)를 나중에 합칠 때 쓰는 선택 목록입니다. sites는 비워 두는 것이 기본이고, 브라우저가 공개 API로 찾은 사이트를 이 목록과 합칩니다. 토큰은 넣지 마세요. 비공개 Pages를 안전하게 넣으려면 GitHub Action이 이 파일의 sites를 갱신하게 하세요. 각 항목은 {name, url, description, repoUrl} 입니다. URL이 실제로 열리지 않으면 허브에 나오지 않습니다.",
+  "sites": []
+}

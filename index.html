@@ -186,7 +186,7 @@ main{position:relative;z-index:2}
 .case h3{font:400 clamp(48px,7.2vw,108px)/1 var(--head);letter-spacing:-.075em;margin:9px 0 34px;overflow-wrap:anywhere}
 .case-inner{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,85px)}
 .case p{font-size:15px;line-height:1.9;color:#d0d4d2;max-width:510px;word-break:keep-all;margin:0 0 25px}
-.project-demo{display:inline-block;margin-left:24px}
+.project-demo,.hub-jump{display:inline-block;margin-left:24px}
 .machine{border-top:1px solid #9a9d9c;border-bottom:1px solid #9a9d9c;align-self:start}
 .machine-head{padding:13px 0 14px;color:#e2e5e4}
 .machine-step{display:grid;grid-template-columns:38px minmax(0,1fr) 24px;gap:16px;padding:13px 0;border-top:1px solid var(--rule);font:500 13px/1.5 var(--mono)}
@@ -273,13 +273,13 @@ main{position:relative;z-index:2}
 @media(max-width:950px){.case-inner{grid-template-columns:1fr}.case p{max-width:650px}.machine,.routing,.diff{max-width:640px}.hero-title{font-size:clamp(58px,12.6vw,112px)}}
 @media(max-width:900px){.pg-col{position:static;max-height:none;margin-inline:auto}.playground{display:flex;flex-direction:column;justify-content:flex-end;min-height:170vh}}
 @media(max-width:660px){
-  .nav{height:68px}.logo{font-size:19px}.links{gap:14px;font-size:10px}.links a:nth-child(n+2):not(:nth-child(3)):not(:last-child){display:none}
+  .nav{height:68px}.logo{font-size:19px}.links{gap:14px;font-size:10px}.links a:nth-child(n+2):not(:nth-child(3)):not(:last-child):not(.nav-hub){display:none}
   .hero-title{font-size:clamp(46px,13vw,80px)}.hero-title .second{padding-left:7vw}
   .hero-bottom{grid-template-columns:1fr;gap:28px}.hero-aside{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:24px}
   .signal .inner{min-height:64px}.signal strong{font-size:15px}
   .stack-row{grid-template-columns:1fr;gap:12px;padding-block:24px}.stack-id{padding:0}.stack-used{flex-direction:row;flex-wrap:wrap;gap:8px 18px;padding-top:0}
   .case{grid-template-columns:1fr;gap:12px}.case-no{font-size:26px}.case h3{font-size:clamp(43px,11vw,70px)}
-  .project-demo{display:block;margin:17px 0 0}
+  .project-demo,.hub-jump{display:block;margin:17px 0 0}
   .archive-list a{grid-template-columns:minmax(0,1fr) 75px;gap:12px}
   .footer{flex-wrap:wrap}
 }
@@ -293,7 +293,7 @@ main{position:relative;z-index:2}
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 
 <header class="nav inner"><a class="logo" href="#top" aria-label="GoldHobbang 홈">GH<b>/</b></a>
-<nav class="links" aria-label="사이트 메뉴"><a href="#stack">STACK</a><a href="#selected">WORK</a><a href="#playground">PLAYGROUND</a><a href="#archive">INDEX</a><a href="#about">ABOUT</a><a href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></nav></header>
+<nav class="links" aria-label="사이트 메뉴"><a href="#stack">STACK</a><a href="#selected">WORK</a><a href="#playground">PLAYGROUND</a><a href="#archive">INDEX</a><a href="#about">ABOUT</a><a class="nav-hub" href="hub.html">HUB</a><a href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></nav></header>
 
 <main id="main">
 <section class="hero inner" id="top" aria-labelledby="hero-heading">
@@ -301,7 +301,7 @@ main{position:relative;z-index:2}
   <h1 class="hero-title" id="hero-heading"><span>GOLD</span><span class="second">HOBBANG<span class="point">.</span></span></h1>
   <div class="hero-bottom">
     <p class="hero-statement">직접 쓰고 싶은 도구를 만들고,<br>작동하는 이유까지 확인합니다.</p>
-    <div class="hero-aside"><p>Python과 TypeScript를 중심으로 개발 도구, 데이터 시스템, 웹·데스크톱 앱을 만드는 학생 개발자입니다. 사용한 기술은 실제 저장소와 연결해 두었습니다.</p><a class="inline-link" href="#selected">SELECTED WORK ↓</a></div>
+    <div class="hero-aside"><p>Python과 TypeScript를 중심으로 개발 도구, 데이터 시스템, 웹·데스크톱 앱을 만드는 학생 개발자입니다. 사용한 기술은 실제 저장소와 연결해 두었습니다.</p><a class="inline-link" href="#selected">SELECTED WORK ↓</a><a class="inline-link hub-jump" href="hub.html">TRANSIT HUB ↗</a></div>
   </div>
 </section>
 <div class="signal reveal-signal"><div class="inner"><strong>12 PROJECTS.</strong><span>5 PUBLIC · 7 PRIVATE</span></div></div>
@@ -357,7 +357,7 @@ main{position:relative;z-index:2}
 
 <section class="about" id="about" aria-labelledby="about-heading"><div class="inner about-grid"><div><h2 id="about-heading">Build it.<br>Then verify.</h2><p>컴퓨터공학과 데이터과학을 공부하는 학생 개발자 GoldHobbang입니다. TodoGround, PocVault, omniSearch뿐 아니라 PDFNative, PoomSa, AutismResearch 등 개발 도구와 데이터 연구를 직접 설계하고 구현합니다. 만들었다는 사실보다 어떻게 설계했고 무엇을 검증했는지를 중요하게 생각합니다.</p><a class="inline-link" href="https://github.com/Goldhobbang" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></div></div></section>
 </main>
-<footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="#top">BACK TO TOP ↑</a></footer>
+<footer class="footer inner meta"><span>© <span id="year">2026</span> GOLDHOBBANG</span><a href="hub.html">HUB ↗</a><a href="#top">BACK TO TOP ↑</a></footer>
 
 
 
